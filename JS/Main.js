@@ -189,7 +189,7 @@ function formatEntry(lsEntry, entry, imgNum = null) {
   
   });
 
-  if (icoNum >= 0) left.appendChild(img);
+  if (icoIdx >= 0) left.appendChild(img);
   left.innerHTML += " " + entry.displayName;
   right.innerHTML = '&nbsp' + entry.displayChoice;
   right.appendChild(dotButton);
