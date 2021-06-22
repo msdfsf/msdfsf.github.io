@@ -6,7 +6,8 @@ function initTwitchBot(channel) {
     },
     connection: {
       cluster: "aws",
-      reconnect: true
+      reconnect: true,
+	  secure: true
     },
     identity: {
       username: "justinfan1488",
