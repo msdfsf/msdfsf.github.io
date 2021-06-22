@@ -119,8 +119,13 @@ function getTwitchSubBadgesByID(userID) {
     const keys = Object.keys(sub);
 
     for (let i = 0; i < keys.length; i++) {
-      months.push(keys[i]);
+      
+      var numKey = Number(keys[i]);
+      if (numKey > 1000) return;
+      
+      months.push(numKey);
       subIcons.push(sub[keys[i]].image_url_4x);
+    
     }
 
   }
