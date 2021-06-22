@@ -459,7 +459,6 @@ function logLocalStorageSpace() {
 
 function serverSaveTimer() {
 
-  console.log(saveInterval);
   if (saveInterval < 1) return;
   window.setTimeout(serverSaveTimer, saveInterval * 1000);
   
