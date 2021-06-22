@@ -94,6 +94,7 @@ function getTwitchUserID(username) {
 
 }
 
+// test later for user without subscribers
 function getTwitchSubBadgesByID(userID) {
 
   H1 = {};
@@ -106,27 +107,28 @@ function getTwitchSubBadgesByID(userID) {
 
   headers = [H1, H2];
 
+  var months = null;
   var subIcons = null;
   httpGet('https://badges.twitch.tv/v1/badges/channels/' + userID + '/display', callback, headers, true);
 
   function callback(response) {
 
     const json = JSON.parse(response);
-    console.log(json)
     const sub = json.badge_sets.subscriber.versions;
 
-    console.log(sub.keys());
+    const keys = Object.keys(sub);
 
-    for (let i = 0; i < 0; i++) {
-
-    }
-    if (sub != null) {
-      subIcons = sub;
-      return;
+    for (let i = 0; i < keys.length; i++) {
+      months.push(keys[i]);
+      subIcons.push(sub(keys[i]).image_url_4x);
     }
 
   }
 
-  return subIcons;
+  ans = {};
+  ans.subIcons = subIcons;
+  ans.months = months;
+
+  return ans;
 
 }
