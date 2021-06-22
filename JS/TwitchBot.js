@@ -75,9 +75,9 @@ function getTwitchUserID(username) {
 
   headers = [H1, H2];
 
+  var userID = null;
   httpGet('https://api.twitch.tv/kraken/users?login=' + username, callback, headers, true);
 
-  var userID = null;
   function callback(response) {
 
     const json = JSON.parse(response);
@@ -106,9 +106,9 @@ function getTwitchSubBadgesByID(userID) {
 
   headers = [H1, H2];
 
+  var subIcons = null;
   httpGet('https://api.twitch.tv/kraken/chat/' + userID + '/badges', callback, headers, true);
 
-  var subIcons = null;
   function callback(response) {
 
     const json = JSON.parse(response);
