@@ -179,7 +179,7 @@ function formatEntry(lsEntry, entry, imgNum = null) {
 
   var dotButton = document.createElement('div');
   dotButton.className += 'dotButton ';
-  dotButton.innerHTML = '⋮';
+  dotButton.innerHTML = ' ⋮';
   dotButton.title = '';
 
   dotButton.addEventListener('click', function(event) {
