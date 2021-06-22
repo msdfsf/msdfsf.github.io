@@ -159,17 +159,17 @@ function formatEntry(lsEntry, entry, imgNum = null) {
     entry.displayChoice = entry.choice.substring(0, MAX_CHOICE_LENGTH);
   }
 
-  var icoNum;
+  var icoIdx;
 
   if (imgNum == null) {
-    icoNum = findRightBadge(subIconsMonths, entry.months);
-    if (entry.sub && icoNum === 0) icoNum = 1;
+    icoIdx = findRightBadgeIndex(subIconsMonths, entry.months);
+    if (entry.sub && icoIdx === 0) icoIdx = 1;
   } else {
-    icoNum = imgNum;
+    icoIdx = imgNum;
   }
 
   var img = document.createElement("img");
-  img.src    = 'SubBadges/' + icoNum + '.png';
+  img.src    = subIcons[icoIdx];
   img.height = '16';
 
   var left = document.createElement("span");
@@ -223,6 +223,25 @@ function findRightBadge(badges, month) {
   }
           
   return Number(lastNumber);
+
+}
+
+function findRightBadgeIndex(badges, month) {
+
+  month = Number(month);
+  if (isNaN(month)) return 0;
+
+  var lastNumber = 0;
+  let i;
+  for (i = 0; i < badges.length; i++) {
+
+    var tmp = badges[i];
+    if (tmp == month) return Number(i);
+    if (tmp < month && lastNumber <= tmp) lastNumber = tmp;
+  
+  }
+          
+  return Number(i - 1);
 
 }
 
@@ -399,22 +418,16 @@ function loadState() {
 
 function loadSubIcons() {
   
-  var channelID = getTwitchUserID('Krabick');
-  console.log(channelID);
-  var subBadges = getTwitchSubBadgesByID(channelID);
-  console.log(subBadges);
+  return getTwitchSubBadgesByID(getTwitchUserID('Krabick'));
 
 }
 
 function init() {
 
   // load sub icons to memory
-  //httpGet('GET https://api.twitch.tv/kraken/chat/<channel ID/badges', loadSubIcons, true)
-
-
   var tmp = loadSubIcons();
-  subIcons = tmp[0];
-  subIconsMonths = tmp[1];
+  subIcons = tmp.subIcons;
+  subIconsMonths = tmp.months;
 
   // init consts
   CHANNEL = 'melharucos';// readCookie('channel');
