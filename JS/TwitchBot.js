@@ -92,4 +92,35 @@ function getTwitchUserID(username) {
 
   return userID;
 
-} 
+}
+
+function getTwitchSubBadgesByID(userID) {
+
+  H1 = {};
+  H1.key = 'Client-ID';
+  H1.value = cfg.CLIENT_ID;
+
+  H2 = {};
+  H2.key = 'Accept';
+  H2.value = 'application/vnd.twitchtv.v5+json';
+
+  headers = [H1, H2];
+
+  httpGet('https://api.twitch.tv/kraken/chat/' + userID + '/badges', callback, headers, true);
+
+  var subIcons = null;
+  function callback(response) {
+
+    const json = JSON.parse(response);
+    const sub = json.subscriber[0];
+
+    if (sub != null) {
+      subIcons = sub;
+      return;
+    }
+
+  }
+
+  return subIcons;
+
+}

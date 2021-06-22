@@ -400,7 +400,9 @@ function loadState() {
 function loadSubIcons() {
   
   var channelID = getTwitchUserID('Krabick');
+  console.log(channelID);
   var subBadges = getTwitchSubBadgesByID(channelID);
+  console.log(subBadges);
 
 }
 
