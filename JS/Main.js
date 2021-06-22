@@ -231,17 +231,21 @@ function findRightBadgeIndex(badges, month) {
   month = Number(month);
   if (isNaN(month)) return 0;
 
+  var lastIdx = 0;
   var lastNumber = 0;
   let i;
   for (i = 0; i < badges.length; i++) {
 
     var tmp = badges[i];
     if (tmp == month) return Number(i);
-    if (tmp < month && lastNumber <= tmp) lastNumber = tmp;
+    if (tmp < month && lastNumber <= tmp) {
+      lastIdx = i;
+      lastNumber = tmp;
+    }
   
   }
           
-  return Number(i - 1);
+  return Number(lastIdx);
 
 }
 
