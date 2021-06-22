@@ -61,3 +61,23 @@ function isSub(user) {
   if (user["badges"] === null) return false;
   return user["subscriber"] || ((modAsSub.state && user["user-type"] === "mod") || (vipAsSub.state && user['badges']["vip"] === "1"));
 }
+
+function getTwitchUserID(username) {
+  
+  H1 = {};
+  H1.key = 'Client-ID';
+  H1.value = cfg.CLIENT_ID;
+
+  H2 = {};
+  H2.key = 'Accept';
+  H2.value = 'application/vnd.twitchtv.v5+json';
+
+  headers = [H1, H2];
+
+  httpGet('https://api.twitch.tv/kraken/users?login=' + username, callback, headers);
+
+  function callback(response) {
+    console.log(response)
+  }
+
+} 

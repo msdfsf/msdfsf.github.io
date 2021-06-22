@@ -361,6 +361,7 @@ function init() {
 
   // load sub icons to memory
   //httpGet('GET https://api.twitch.tv/kraken/chat/<channel ID/badges', loadSubIcons, true)
+  getTwitchUserID('Krabick');
   function loadSubIcons() {
     
   }

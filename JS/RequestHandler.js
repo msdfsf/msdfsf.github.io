@@ -1,10 +1,15 @@
-function httpGet(url, callback, sync = false) {
+function httpGet(url, callback, headers, sync = false) {
     
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() { 
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
             callback(xmlHttp.responseText);
     }
+    
+    for (i = 0; i < headers.length; i++) {
+        xmlHttp.setRequestHeader(headers[i].key, headers[i].value);
+    }
+
     xmlHttp.open('GET', url, sync);
     xmlHttp.send(null);
 
