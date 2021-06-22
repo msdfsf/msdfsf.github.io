@@ -320,6 +320,7 @@ function loadEntry(entryString) {
 
 }
 
+/*
 function loadState() {
 
   loadButtonState(sub);
@@ -356,16 +357,62 @@ function loadState() {
   }
 
 }
+*/
+
+function loadState() {
+
+
+  loadButtonState(sub);
+  loadButtonState(modAsSub);
+  loadButtonState(vipAsSub);
+  loadButtonState(subsOnly);
+  loadButtonState(duplicateCheck);
+
+  prepareButton(sub);
+  prepareButton(modAsSub);
+  prepareButton(vipAsSub);
+  prepareButton(subsOnly);
+  prepareButton(duplicateCheck);
+
+  flCnt = Number(localStorage.getItem('fol_count'));
+  sbCnt = Number(localStorage.getItem('sub_count'));
+
+  for (let i = 1; i <= flCnt; i++) {
+
+    var entryString = localStorage.getItem('fol_' + i);
+    var entry = loadEntry(entryString);
+    addEntry(entry);
+    folEntries[entry.name] = entry;
+  
+  }
+
+  for (let i = 1; i <= sbCnt; i++) {
+   
+    var entryString = localStorage.getItem('sub_' + i);
+    var entry = loadEntry(entryString);
+    addEntry(entry);
+    subEntries[entry.name] = entry;
+  
+  }
+
+}
+
+function loadSubIcons() {
+  
+  var channelID = getTwitchUserID('Krabick');
+  var subBadges = getTwitchSubBadgesByID(channelID);
+
+}
 
 function init() {
 
   // load sub icons to memory
   //httpGet('GET https://api.twitch.tv/kraken/chat/<channel ID/badges', loadSubIcons, true)
-  getTwitchUserID('Krabick');
-  function loadSubIcons() {
-    
-  }
-  subIconsMonths = [0, 1, 3, 6, 9, 12, 18, 30];
+
+
+  var tmp = loadSubIcons();
+  subIcons = tmp[0];
+  subIconsMonths = tmp[1];
 
   // init consts
   CHANNEL = 'melharucos';// readCookie('channel');
@@ -482,5 +529,11 @@ function isHashEmpty(hash) {
     return false;
 
   return true;
+
+}
+
+function displayError(error) {
+
+  console.log('[ERROR] error');
 
 }
