@@ -74,7 +74,7 @@ function getTwitchUserID(username) {
 
   headers = [H1, H2];
 
-  httpGet('https://api.twitch.tv/kraken/users?login=' + username, callback, headers, false);
+  httpGet('https://api.twitch.tv/kraken/users?login=' + username, callback, headers);
 
   function callback(response) {
     console.log(response)
