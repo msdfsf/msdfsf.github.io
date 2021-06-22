@@ -430,7 +430,7 @@ function init() {
   subIconsMonths = tmp.months;
 
   // init consts
-  CHANNEL = 'melharucos';// readCookie('channel');
+  CHANNEL = 'Krabick';// readCookie('channel');
   MAX_CHOICE_LENGTH = 60;
 
   // init vars
