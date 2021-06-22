@@ -107,7 +107,7 @@ function getTwitchSubBadgesByID(userID) {
   headers = [H1, H2];
 
   var subIcons = null;
-  httpGet('https://api.twitch.tv/kraken/chat/' + userID + '/badges', callback, headers, true);
+  httpGet('https://badges.twitch.tv/v1/badges/channels/' + userID + '/display', callback, headers, true);
 
   function callback(response) {
 
