@@ -6,7 +6,7 @@ function httpGet(url, callback, headers, sync = false) {
             callback(xmlHttp.responseText);
     }
 
-    xmlHttp.open('GET', url, sync);
+    xmlHttp.open('GET', url, !sync);
     
 	for (i = 0; i < headers.length; i++) {
         xmlHttp.setRequestHeader(headers[i].key, headers[i].value);
