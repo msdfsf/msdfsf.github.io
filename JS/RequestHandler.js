@@ -5,13 +5,14 @@ function httpGet(url, callback, headers, sync = false) {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
             callback(xmlHttp.responseText);
     }
-    
-    for (i = 0; i < headers.length; i++) {
-        xmlHttp.setRequestHeader(headers[i].key, headers[i].value);
-    }
 
     xmlHttp.open('GET', url, sync);
-    xmlHttp.send(null);
+    
+	for (i = 0; i < headers.length; i++) {
+        xmlHttp.setRequestHeader(headers[i].key, headers[i].value);
+    }
+	
+	xmlHttp.send(null);
 
 }
 
