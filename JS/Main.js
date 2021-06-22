@@ -191,10 +191,8 @@ function formatEntry(lsEntry, entry, imgNum = null) {
 
   if (icoIdx >= 0) left.appendChild(img);
   left.innerHTML += " " + entry.displayName;
-  
-  textNode = document.createTextNode('&nbsp' + entry.displayChoice);
-  //right.innerHTML = '&nbsp' + entry.displayChoice;
-  right.appendChild(textNode);
+
+  right.innerHTML = '&nbsp' + entry.displayChoice;
   right.appendChild(dotButton);
   right.title = entry.choice;
 
