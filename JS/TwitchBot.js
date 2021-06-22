@@ -112,6 +112,7 @@ function getTwitchSubBadgesByID(userID) {
   function callback(response) {
 
     const json = JSON.parse(response);
+    console.log(json)
     const sub = json.badge_set.subscriber;
 
     console.log(sub.keys());
