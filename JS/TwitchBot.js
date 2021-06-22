@@ -107,8 +107,8 @@ function getTwitchSubBadgesByID(userID) {
 
   headers = [H1, H2];
 
-  var months = null;
-  var subIcons = null;
+  var months = [];
+  var subIcons = [];
   httpGet('https://badges.twitch.tv/v1/badges/channels/' + userID + '/display', callback, headers, true);
 
   function callback(response) {
