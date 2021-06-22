@@ -120,7 +120,7 @@ function getTwitchSubBadgesByID(userID) {
 
     for (let i = 0; i < keys.length; i++) {
       months.push(keys[i]);
-      subIcons.push(sub(keys[i]).image_url_4x);
+      subIcons.push(sub[keys[i]].image_url_4x);
     }
 
   }
