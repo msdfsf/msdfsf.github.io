@@ -179,7 +179,7 @@ function formatEntry(lsEntry, entry, imgNum = null) {
 
   var dotButton = document.createElement('div');
   dotButton.className += 'dotButton ';
-  dotButton.innerHTML = ' ⋮';
+  dotButton.innerHTML = '⋮';
   dotButton.title = '';
 
   dotButton.addEventListener('click', function(event) {
@@ -191,7 +191,10 @@ function formatEntry(lsEntry, entry, imgNum = null) {
 
   if (icoIdx >= 0) left.appendChild(img);
   left.innerHTML += " " + entry.displayName;
-  right.innerHTML = '&nbsp' + entry.displayChoice;
+  
+  textNode = document.createTextNode('&nbsp' + entry.displayChoice);
+  //right.innerHTML = '&nbsp' + entry.displayChoice;
+  right.appendChild(textNode);
   right.appendChild(dotButton);
   right.title = entry.choice;
 
