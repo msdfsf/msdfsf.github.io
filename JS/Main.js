@@ -582,7 +582,7 @@ function displayError(errorMessage) {
   container.style.width = '100%';
   container.style.height = '25%'; // (100 / errorField.MAX_ERRORS) + '%';
   //container.style.marginTop = 'auto';
-  container.style.marginBottom = 'auto';
+  container.style.marginTop = 'auto';
   container.innerHTML = '[ERROR] ' + errorMessage;
 
   var errors = errorField.getElementsByTagName('div');
