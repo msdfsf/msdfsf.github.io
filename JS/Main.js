@@ -506,6 +506,7 @@ function init() {
   errorField.style.height         = '600px';
   errorField.style.display        = 'flex';
   errorField.style.flexDirection  = 'column';
+  errorField.style.flex           = 1;
 
   errorField.MAX_ERRORS = 4;
   errorField.ERROR_HEIGHT = 600 / errorField.MAX_ERRORS;
