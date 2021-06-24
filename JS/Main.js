@@ -575,7 +575,7 @@ function displayError(errorMessage) {
 
   console.log('[ERROR] ' + errorMessage);
 
-  var container = document.createElement('ttl');
+  var container = document.createElement('div');
 
   container.style.backgroundColor = 'red';
   container.style.width = '100%';
