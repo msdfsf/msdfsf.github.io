@@ -503,14 +503,17 @@ function init() {
   errorField.style.bottom         = 0;
   errorField.style.right          = 0;
   errorField.style.width          = '200px';
-  errorField.style.height         = '600px';
+  errorField.style.height         = 'auto';
   errorField.style.display        = 'flex';
   errorField.style.flexDirection  = 'column';
-  errorField.style.flex           = 1;
+  errorField.style.justifyContent = 'flex-end';
+  errorField.style.boxSizing      = 'border-box';
+  errorField.style.overflow       = 'hidden';
 
   errorField.MAX_ERRORS = 4;
   errorField.ERROR_HEIGHT = 600 / errorField.MAX_ERRORS;
-  errorField.TTL = 3; // in s
+  errorField.TTL = 10; // in s
+  errorField.errorsCount = 0;
 
   document.body.appendChild(errorField);
 
@@ -544,7 +547,7 @@ function logLocalStorageSpace() {
 
 function serverSaveTimer() {
 
-  displayError('HUI SOSI');
+  displayError('Could not save data! Alert!');
 
   if (saveInterval < 1) return;
   window.setTimeout(serverSaveTimer, saveInterval * 1000);
@@ -572,30 +575,71 @@ function isHashEmpty(hash) {
 
 }
 
+var errorID = 0;
 function displayError(errorMessage) {
 
   console.log('[ERROR] ' + errorMessage);
 
-  var container = document.createElement('div');
+  let container = document.createElement('div');
 
-  container.style.backgroundColor = 'red';
-  container.style.width = '100%';
-  container.style.height = '25%'; // (100 / errorField.MAX_ERRORS) + '%';
-  //container.style.marginTop = 'auto';
-  container.style.marginTop = 'auto';
-  container.innerHTML = '[ERROR] ' + errorMessage;
+  container.style.color           = 'white';
+  container.style.backgroundColor = '#FF3333';
+  container.style.width           = '100%';
+  container.style.height          = '80px';
+  container.style.marginTop       = '2px';
+  container.style.boxSizing       = 'border-box';
+  container.style.padding         = '4%';
+  container.style.borderRadius    = '5px';
+  container.style.borderWidth     = '2px';
+  container.style.borderStyle     = 'solid';
+  container.style.borderColor     = 'white';
+  container.style.display         = 'flex';
+  container.style.flexDirection   = 'row';
+  container.style.alignItems      = 'center';
+  container.style.justifyContent  = 'start';
+  container.style.transition      = 'all 0.5s, ease-out';
 
-  var errors = errorField.getElementsByTagName('div');
-  if (errors.length >= errorField.MAX_ERRORS) {
-    errorField.removeChild(errors[errors.length - 1]);
+  var symbol = document.createElement('img');
+
+  symbol.src                = 'Icons/error.svg';
+  symbol.style.height       = '50%';
+  symbol.style.aspectRatio  = '1 / 1';
+  symbol.style.paddingRight = '6%';
+  symbol.style.filter       = 'invert(1)';
+
+  var message = document.createElement('div');
+
+  message.style.height = 'auto';
+  message.innerHTML = errorMessage + '[' + errorID + ']';
+  errorID++;
+
+  if (errorField.errorsCount >= errorField.MAX_ERRORS) {
+    
+    clearTimeout(errorField.firstChild.ttlTmr);
+    errorField.removeChild(errorField.firstChild);
+  
   }
 
+  container.appendChild(symbol);
+  container.appendChild(message);
   errorField.appendChild(container);
 
   setTimeout(function() {
 
+    container.style.marginTop      = '2px';
+
+  }, 20);
+
+
+
+
+  errorField.errorsCount++;
+
+  container.ttlTmr = setTimeout(function() {
+
     errorField.removeChild(container);
-  
+    errorField.errorsCount--;
+
   }, errorField.TTL * 1000);
 
 }
