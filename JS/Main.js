@@ -496,6 +496,9 @@ function init() {
     
   }
 
+  // init error handler
+  document.body.appendChild(errorField);
+
   // init twitch bot
   initTwitchBot(CHANNEL);
 
@@ -563,8 +566,6 @@ errorField.style.width = '200px';
 errorField.style.height = '600px';
 errorField.MAX_ERRORS = 4;
 errorField.ERROR_HEIGHT = 600 / errorField.MAX_ERRORS;
-
-document.body.appendChild(errorField);
 
 function displayError(errorMessage) {
 
