@@ -499,11 +499,14 @@ function init() {
   // init error handler
   errorField = document.createElement('div');
 
-  errorField.style.position = 'absolute';
-  errorField.style.bottom = 0;
-  errorField.style.right = 0;
-  errorField.style.width = '200px';
-  errorField.style.height = '600px';
+  errorField.style.position       = 'absolute';
+  errorField.style.bottom         = 0;
+  errorField.style.right          = 0;
+  errorField.style.width          = '200px';
+  errorField.style.height         = '600px';
+  errorField.style.display        = 'flex';
+  errorField.style.flexDirection  = 'column';
+
   errorField.MAX_ERRORS = 4;
   errorField.ERROR_HEIGHT = 600 / errorField.MAX_ERRORS;
   errorField.TTL = 3; // in s
