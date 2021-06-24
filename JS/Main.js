@@ -559,11 +559,11 @@ function serverSaveTimer() {
   
   // ? functions ?
   for (fol in newFolEntries) {
-    jsonBody += '(' + newFolEntries[fol].name + ', ' + false + ', ' + newFolEntries[fol].months + ', ' + newFolEntries[fol].choice + '), ';
+    jsonBody += '(\"' + newFolEntries[fol].name + '\", ' + 0 + ', ' + newFolEntries[fol].months + ', \"' + addSlashes(newFolEntries[fol].choice) + '\"), ';
   }
 
   for (sub in newFolEntries) {
-    jsonBody += '(' + newFolEntries[sub].name + ', ' + true + ', ' + newFolEntries[sub].months + ', ' + newFolEntries[sub].choice + '), ';
+    jsonBody += '(\"' + newFolEntries[sub].name + '\", ' + 1 + ', ' + newFolEntries[sub].months + ', \"' + addSlashes(newFolEntries[sub].choice) + '\"), ';
   }
 
   jsonBody = jsonBody.substring(0, jsonBody.length - 2); // meh
@@ -631,6 +631,10 @@ function appendHash(target, source) {
     if (source.hasOwnProperty(x))
       target[x] = source[x];
 
+}
+
+ function addSlashes(str) {
+  return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 }
 
 var errorID = 0;

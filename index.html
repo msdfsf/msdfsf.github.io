@@ -1,33 +1,274 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
+
+    <script>
+
+      const ROOT_URL  = 'msdfsf.github.io';
+
+      var token = localStorage.getItem('token');
+      // api/user/me call have to be here...
+
+      var isPremium = false; // suppose we have this value
+
+      if (!isPremium) window.location.href = ROOT_URL + '/crossroad.html';
+      
+    </script>
     
     <meta content = 'text/html; charset = UTF-8'>
 
+    <link rel = 'stylesheet' href = 'Main.css'>
+    
     <style>
 
-      @import url('https://fonts.googleapis.com/css2?family=Raleway&family=Roboto&display=swap');
+      .notSideBar {
 
-      * {
-        font-family: 'Roboto', sans-serif;
+        width: 80%;
+        height: 90%;
+
+      }
+      
+      .bwButton {
+        border: none;
+        background-color: #58D68D;
+        color: white;
+        background-color: black;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 0;
+        cursor: pointer;
+        padding: 0;
+        border-style: solid;
+        border-color: white;
+        border-radius: 0;
       }
 
-      body {
-        position: relative;
+      .flatButton {
+        width: 33.33333333%;
+        border: none;
+        background-color: #58D68D;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 0;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .flatButton:focus {
+        outline: none;
+      } 
+
+      .addButton {
+        width: 15%;
+        border-radius: 0;
+        border-style: solid;
+        border-color: grey;
+        height: 40px;        
+      }
+
+      .entriesCheckButton {
+        width: 100%;
+        height: 40px;
+      }
+
+      .resetButton, .exportButton, .addButton {
+        background-color: black;
+        border-style: solid;
+        border-color: white;
+        color: white;
+        border-width: 1px;
         box-sizing: border-box;
+      }
+
+      .exportButton, .importButton {
+        background-color: black; 
+        height: 40px;
+      }
+
+      .exportButton:active, .resetButton:active, .addButton:active {
+        background-color: white;
+        color: black;
+      }
+
+      .importButton {
+        border-style: dashed;
+        border-color: white;
+        background-color: transparent;
+      }
+
+      .buttonOn {
+        background-color: #58D68D;
+      }
+
+      .buttonOff {
+        background-color: #EC7063;
+      }
+
+      input[type=checkbox] {
+        width: 10%;
+        height: 30px;
         margin: 0;
         padding: 0;
-        background-color: black; 
-        background-image: url('background.png');
-		    background-size: cover;
-        height: 100vh;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
       }
 
-      .noticeBack {
+      .toggleButton {
+        display: block;
+        position: absolute;
+        cursor: pointer;
+        font-size: 30px;
+        width: 30px;
+        height: 30px;
+        margin: 0px 0px;
+        left: 250px;
+        top: -2.5px;
+        user-select: none;
+      }
+
+      .sidebar {
+        backdrop-filter: blur(5px);
+        background-color: rgba(30,32,34,0.8);
+        font-size: large;
+        color: white;
+        position: fixed;
+        width: 250px;
+        left: -250px;
+        height: 100%;
+        top: 0;
+        transition: all 500ms cubic-bezier(0.45, 1.5, 0.75, 1);
+      }
+
+      .sidebarBehind {
+        width: 100px;
+        left: -350px;
+      }
+	  
+      .sidebarTitle {
+        border-style: 
+        none none none solid; 
+        padding: 10px;
+        font-weight: bold;
+        font-family: 'Raleway', sans-serif;
+        font-size: 25px;
+        user-select: none;
+      }
+
+      .sidebarControls {
+        position: relative;
+        width: 100%;
+      }
+
+      .sidebarActive {
+        left: 0px;
+      }
+
+      .sidebarBehindActive {
+        left: -100px;
+      }
+
+      .sidebarFullRow {
+        position: relative;
+        padding: 0;
+        height: 30px;
+        margin-left: 5%;
+        margin-bottom: 5%;
+        width: 90%;
+      }
+
+      .sidebarLeftCol {
+        position: relative;
+        display: inline-block;
+        padding: 0;
+        height: 30px;
+        width: 44%;
+        margin-left: 5%;
+        margin-right: 1%;
+        margin-bottom: 5%;
+      }
+
+      .sidebarRightCol {
+        position: relative;
+        display: inline-block;
+        padding: 0;
+        height: 30px;
+        width: 44%;
+        margin-left: 1%;
+        margin-right: 5%;
+        margin-bottom: 5%;
+      }
+
+      .sidebarLabel {
+        box-sizing: border-box;
+        color: white;
+        line-height: 30px;
+        font-size: 15px;
+        text-align: center;
+        background-color: black;
+        border-radius: 5px;
+        border-color: white;
+        border-style: solid;
+        border-width: 1px;
+
+      }
+
+      .dotButton {
+        display: inline-block;
+        padding-left: 16px;
+        margin-right: 0;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .addRecordBack {
+        box-sizing: border-box;
+        background-color: #131313;
+        box-shadow: 0px 0px 14px 0px rgba(44, 44, 44, 0.75);
+        color: white;
+        width: 300px;
+        height: 420px;
+        display: inline-block;
+        text-align: center;
+        position: absolute;
+        left: 50%;   
+        top: 50%;
+        bottom: 10px;
+        padding: 50px 50px;
+        border-radius: 10px;
+        transform: translate(-50%, -50%); 
+        display: none;
+      }
+
+      .addRecordInput {
+        position: relative;
+        box-sizing: border-box;
+        background-color: #131313;
+        color: white;
+        height: 50px;
+        width: 100%;
+        border-color: white;
+        border-style: none none solid none;
+        border-radius: 5px;
+        border-width: 2px;
+        margin-bottom: 40px;
+        display: block;
+      }
+
+      .addRecordInput:focus{
+        outline: none;
+      }
+
+      .addRecordButton {
+        position: relative;
+        width: 100%;
+        height: 50px;
+        margin: 0;
+        margin-bottom: 38px;
+        cursor: pointer;
+      }
+
+      .boolChoiceBack {
         position: absolute;
         box-sizing: border-box;
         background-color: #131313;
@@ -44,7 +285,7 @@
         transform: translate(-50%, -50%); 
       }
 
-      .noticeItem {
+      .boolChoiceItem {
         box-sizing: border-box;
         position: relative;
         width: 100%;
@@ -53,7 +294,7 @@
         cursor: pointer;
       }
 
-      .noticeItem:after {
+      .boolChoiceItem:after {
         display: block;
         content: '';
         transform: scaleX(0); 
@@ -62,60 +303,342 @@
         border-color: white;
       }
 
-      .noticeItem:hover:after {
+      .boolChoiceItem:hover:after {
         transform: scaleX(1); 
       }
 
-      .noticeTitle {
+      .boolChoiceTitle {
         box-sizing: border-box;
         border-style: none none solid none;
         border-width: 1px;
         padding: 10px;
-        margin-bottom: 20px;
         font-family: 'Raleway', sans-serif;
-        font-weight: bold;
+      }
+
+      .numPickerInput {
+        box-sizing: border-box;
+        border-color: white;
+        background-color: black;
+        border-style: solid solid solid solid;
+        border-width: 1px;
+        border-radius: 5px 0 0 5px;
+        display: inline-block;
+        line-height: 30px;
+        text-align: center;
+        height: 30px;
+        width: 50%;
+        user-select: none;
+      }
+
+      .numPickerButtonsBox {
+        float: right;
+        box-sizing: border-box;
+        height: 100%;
+        width: 50%;
+        user-select: none;
+      }
+
+      .numPickerInc {
+        box-sizing: border-box;
+        border-color: white;
+        background-color: black;
+        border-style: solid solid none none;
+        border-width: 1px;
+        text-align: center;
+        border-radius: 0 5px 0 0;
+        display: block;
+        font-size: 14px;
+        line-height: 15px;
+        height: 15px;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .numPickerInc:active {
+        font-size: 10px;
+      }
+
+      .numPickerDec {
+        box-sizing: border-box;
+        border-color: white;
+        background-color: black;
+        border-style: none solid solid none;
+        border-width: 1px;
+        border-radius: 0 0 5px 0;
+        display: block;
+        text-align: center;
+        font-size: 14px;
+        line-height: 15px;
+        height: 15px;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .numPickerDec:active {
+        font-size: 10px;
       }
 
     </style>
+
+    <script src = "Config.cfg"></script>
+
+    <script src = "JS/tmi.min.js"></script>
+    <script src = "JS/TwitchBot.js"></script>
+    <script src = "JS/Main.js"></script>
+    <script src = "JS/AnimationAndStuff.js"></script>
+    <script src = "JS/RequestHandler.js"></script>
+    <script src = "JS/FileHandler.js"></script>
+    <script src = "JS/PopupMenu.js"></script>
 	
   </head>
 
   <body>
 
-    <script>
-    
-      init();
-      
-      function init() {
+    <div id = "notSideBar" class = 'notSideBar' onclick = "clickToggleSidebar()">
 
-        const ROOT_URL  = 'msdfsf.github.io';
+      <div class = 'listsContainer'>
+        <div class = 'listsOfChoices'>
+          <div id = 'folListFull' class = 'listContainer'>
+            <div class = 'listTitle'>Followers</div>
+            <hr class = 'listSeparator'></hr>
+            <ul id = "folList" class = "listStyle">
+            </ul>
+          </div
+          ><div id = 'subListFull' class = 'listContainer'>
+            <div class = 'listTitle'>Subscribers</div>
+            <hr class = 'listSeparator'></hr>
+            <ul id = "subList" class = "listStyle">
+            </ul>
+          </div>
+        </div>
+      </div>
 
-        var token = localStorage.getItem('token');
-        // api/user/me call have to be here...
-
-        var isPremium = false; // suppose we have this value
-
-        if (!isPremium) return;
-
-        window.location.href = ROOT_URL + '/admin.html';
-      
-      }
-
-      function viewListsRedirect() {
-        console.log('1');
-      }
-
-      function newPremiumRequest() {
-        console.log('2');
-      }
-
-    </script>
-    
-    <div class = 'noticeBack'>
-      <div class = 'noticeTitle'>What are you doing here?</div>
-      <div class = 'noticeItem' onclick = 'viewListsRedirect()'>Wanna view requests lists</div>
-      <div class = 'noticeItem' onclick = 'newPremiumRequest()'>Wanna ask for permission</div>
     </div>
 
+    <div id = "sidebarBehind" class = "sidebar sidebarBehind"></div>
+      
+    <div id = "sidebar" class = "sidebar">
+
+      <div class = "toggleButton" onclick = "toggleSidebar()">
+        &#9776
+      </div>
+
+      <p class = "sidebarTitle"> Controls </p>
+      <div class = "sidebarControls">
+    
+        <button id = "collectRequests" onclick = "changeCollectRequests()" class = "flatButton sidebarFullRow">Collect Requests</button>
+        <button id = "addRecordTrigger" onclick = "displayAddRecord()" class = "flatButton addButton sidebarFullRow">Add Record</button>
+        <button id = "resetButton" onclick = "clearStorage();" class = "flatButton resetButton sidebarFullRow">Reset</button>
+
+      </div>
+
+      <p class = "sidebarTitle"> Settings </p>
+      <div class = "sidebarControls">
+
+        <button id = "duplicatesCheck" onclick = "changeDuplicateCheck()" class = "flatButton sidebarLeftCol buttonOn">Duplicates Check</button
+        ><button id = "subsOnly" onclick = "changeSubsOnly()" class = "flatButton sidebarRightCol buttonOn">Subs Only</button>
+        
+        <button id = "modAsSub" onclick = "changeModAsSub()" class = "flatButton sidebarLeftCol buttonOn">Mods ASS Subs</button
+        ><button id = "vipAsSub" onclick = "changeVipAsSub()" class = "flatButton sidebarRightCol buttonOn">Vips ASS Subs</button>
+    
+        <button id = "hideSub" onclick = "changeHideSub(this)" class = "flatButton sidebarLeftCol buttonOn">Hide Subscribers</button
+        ><button id = "hideFol" onclick = "changeHideFol(this)" class = "flatButton sidebarRightCol buttonOn">Hide Followers</button>
+
+        <div class = 'sidebarLabel sidebarLeftCol'>Server Save</div
+          ><div class = 'sidebarRightCol'>
+            <div id = 'saveIntInp' class = 'numPickerInput'>5</div
+            ><div class = 'numPickerButtonsBox'>
+              <div onclick = 'incSaveInterval(1)' class = 'numPickerInc'>&#x25B2</div
+              ><div onclick = 'incSaveInterval(-1)' class = 'numPickerDec'>&#x25BC</div>
+            </div>
+          </div>
+
+      </div>
+
+      <p class = "sidebarTitle"> Export / Import </p>
+      <div class = "sidebarControls">
+
+        <button id = "importData" oncontextmenu = "return false;" ondragover = "return false" ondrop = "event.preventDefault(); boolChoiceMenu(event, 'Which list to import?', 'Followers', 'Subscribers', dragAndDropFolFile, dragAndDropSubFile, event.dataTransfer.files)" onclick = "boolChoiceMenu(event, 'Which list to import?', 'Followers', 'Subscribers', processFolFileByClick, processSubFileByClick)" class = "flatButton sidebarFullRow importButton">Import As TXT</button>
+        <button id = "exportCSV" onclick = "exportAsCSV()" class = "flatButton sidebarFullRow exportButton">Export As CSV</button>
+        <button id = "exportTXT" onclick = "boolChoiceMenu(event, 'Which list to export?', 'Followers', 'Subscribers', exportFolAsTXT, exportSubAsTXT)" class = "flatButton sidebarFullRow exportButton">Export As TXT</button>
+
+      </div>
+
+    </div>
+
+    <div id = 'addRecord' class = 'addRecordBack'>
+      <input id = 'addRecordName' class = 'addRecordInput' placeholder = 'Name'/>
+      <input id = 'addRecordChoice' class = 'addRecordInput' placeholder = 'Choice'/>
+      <button id = 'addRecordIsSub' class = 'flatButton addRecordButton buttonOn' onclick = 'changeSub()'>Subscriber</button>
+      <button class = 'addRecordButton resetButton' onclick = 'addRecord()'>Add Record</button>
+    </div>
+
+    <script>
+
+      function incSaveInterval(val) {
+
+        var tmp = saveInterval;
+
+        saveInterval += val;
+        if (saveInterval < 0) saveInterval = 0;
+        else if (saveInterval > 999) saveInterval = 999;
+
+        if (tmp === 0 && saveInterval > tmp) serverSaveTimer(); // define inside main.js
+
+        document.getElementById('saveIntInp').innerHTML = saveInterval;
+
+      }
+
+      function boolChoiceMenu(event, name, varA, varB, fcnA, fcnB, param) {
+
+        if (document.getElementById('boolChoice') != null) return;
+
+        event.stopPropagation();
+
+        var back = document.createElement('div');
+        back.className += 'boolChoiceBack';
+        back.id = 'boolChoice';
+
+        var title = document.createElement('div');
+        title.className += 'boolChoiceTitle';
+        title.innerHTML = name;
+
+        var choiceA = document.createElement('div');
+        choiceA.className += 'boolChoiceItem';
+        choiceA.innerHTML = varA;
+        choiceA.addEventListener('click', function() {
+          back.parentNode.removeChild(back);
+          fcnA(event, param);
+        });
+
+        var choiceB = document.createElement('div');
+        choiceB.className += 'boolChoiceItem';
+        choiceB.innerHTML = varB;
+        choiceB.addEventListener('click', function() {
+          back.parentNode.removeChild(back);
+          fcnB(event, param);
+        });
+
+        document.body.addEventListener('click', function(event) {
+          if (event.target != back && back != null && back.parentNode != null)
+            back.parentNode.removeChild(back);
+        });
+
+        back.appendChild(title);
+        back.appendChild(choiceA);
+        back.appendChild(choiceB);
+        document.body.appendChild(back);
+
+      }
+
+      document.body.addEventListener('click', function(event) {
+        
+        triggerButton = document.getElementById('addRecordTrigger');
+        elementToHide = document.getElementById('addRecord');
+
+        if (event.target != triggerButton && !event.path.includes(elementToHide))
+          elementToHide.style.display = 'none';
+
+      });
+
+      function displayAddRecord() {
+        document.getElementById('addRecord').style.display = 'block';
+      }
+
+      function addRecord() {
+
+        takeCareAboutItem(
+          document.getElementById('addRecordName').value.toLowerCase(),
+          document.getElementById('addRecordChoice').value, 
+          sub.state, 
+          document.getElementById('addRecordName').value,
+          (sub.state) ? 1 : 0
+        );
+
+        document.getElementById('addRecord').style.display = 'none';
+      
+      }
+
+      function changeHideSub(source) {
+    
+        btFol = document.getElementById('hideFol');
+      
+        lsSub = document.getElementById('subListFull');
+        lsFol = document.getElementById('folListFull');
+        hideList(lsSub, lsFol, source, btFol);
+      
+      }
+      
+      function changeHideFol(source) {
+        
+        btSub = document.getElementById('hideSub');
+        
+        lsSub = document.getElementById('subListFull');
+        lsFol = document.getElementById('folListFull');
+        hideList(lsFol, lsSub, source, btSub);
+      
+      }
+        
+      document.getElementById('hideSub').strA = 'Hide Subscribers';
+      document.getElementById('hideSub').strB = 'Show Subscribers';
+      
+      document.getElementById('hideFol').strA = 'Hide Followers';
+      document.getElementById('hideFol').strB = 'Show Followers';
+
+      document.getElementById('subListFull').state = 1;
+      document.getElementById('folListFull').state = 1;
+        
+      function hideList(lsA, lsB, btA, btB) {
+          
+        if (lsA.state === 0) {
+          // list is already hidden, so we show it
+          
+          lsA.style.width = '50%';
+          lsA.style.opacity = 1;
+          lsA.style.padding = '10px';
+          lsB.style.width = '50%';
+          
+          lsA.state = 1;
+          lsB.state = 1;
+
+          toggleChoiceButton(btA, true);
+          //btB.classList.toggle('buttonOff');
+        
+          return;
+        
+        }
+        
+        lsA.style.width = 0;
+        lsA.style.opacity = 0;
+        lsA.style.padding = 0;
+        lsB.style.width = '100%';
+        lsB.style.opacity = 1;
+        
+        toggleChoiceButton(btA, false);
+        if (lsB.state === 0)
+          toggleChoiceButton(btB, true);
+
+        lsB.state = 1;
+        lsA.state = 0;
+        
+      }
+
+      function toggleChoiceButton(bt, state) {
+
+        bt.classList.toggle('buttonOff');
+        bt.innerHTML = (state) ? bt.strA : bt.strB;
+
+      }
+
+      // tmp solution
+      setCookie('channel', 'Krabick', 1);
+
+    </script>
+
+    <script> 
+      init();
+      loadStateLocalStorage(); // exchange later for loadState();  
+    </script>
+    
   </body>
 </html>
