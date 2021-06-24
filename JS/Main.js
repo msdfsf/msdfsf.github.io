@@ -526,6 +526,8 @@ function logLocalStorageSpace() {
 
 function serverSaveTimer() {
 
+  displayError('HUI SOSI');
+
   if (saveInterval < 1) return;
   window.setTimeout(serverSaveTimer, saveInterval * 1000);
   
@@ -552,8 +554,33 @@ function isHashEmpty(hash) {
 
 }
 
-function displayError(error) {
+var errorField = document.createElement('div');
 
-  console.log('[ERROR] error');
+errorField.style.position = 'absolute';
+errorField.style.bottom = 0;
+errorField.style.right = 0;
+errorField.style.width = '200px';
+errorField.style.height = '600px';
+errorField.MAX_ERRORS = 4;
+errorField.ERROR_HEIGHT = 600 / errorField.MAX_ERRORS;
+
+function displayError(errorMessage) {
+
+  console.log('[ERROR] ' + errorMessage);
+
+  var container = document.createElement('div');
+  container.style.position = 'relative';
+  container.style.display = 'block';
+  container.style.backgroundColor = 'red';
+  container.style.width = '100%';
+  container.style.height = '25%'; // (100 / errorField.MAX_ERRORS) + '%';
+  container.innerHTML = '[ERROR] ' + errorMessage;
+
+  var errors = errorField.getElementsByTagName('div');
+  if (errors.length >= errorField.MAX_ERRORS) {
+    errorField.removeChild(errors[errors.length - 1]);
+  }
+
+  errorField.appendChild(container);
 
 }
