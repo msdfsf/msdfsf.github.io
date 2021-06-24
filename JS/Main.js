@@ -433,7 +433,7 @@ function init() {
 
   // init consts
   LIST_NAME = 'default';
-  CHANNEL = 'gaules';// readCookie('channel');
+  CHANNEL = 'msdfsf';// readCookie('channel');
   MAX_CHOICE_LENGTH = 60;
 
   // init vars
