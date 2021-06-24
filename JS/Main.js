@@ -344,20 +344,7 @@ function loadEntry(entryString) {
 
 }
 
-/*
-function loadState() {
-
-  loadButtonState(sub);
-  loadButtonState(modAsSub);
-  loadButtonState(vipAsSub);
-  loadButtonState(subsOnly);
-  loadButtonState(duplicateCheck);
-
-  prepareButton(sub);
-  prepareButton(modAsSub);
-  prepareButton(vipAsSub);
-  prepareButton(subsOnly);
-  prepareButton(duplicateCheck);
+function loadStateLocalStorage() {
 
   flCnt = Number(localStorage.getItem('fol_count'));
   sbCnt = Number(localStorage.getItem('sub_count'));
@@ -381,10 +368,24 @@ function loadState() {
   }
 
 }
-*/
+
+function deleteStateLocalStorage() {
+
+  flCnt = Number(localStorage.getItem('fol_count'));
+  sbCnt = Number(localStorage.getItem('sub_count'));
+
+  for (let i = 1; i <= flCnt; i++)
+    localStorage.removeItem('fol_' + i);
+
+  for (let i = 1; i <= sbCnt; i++)
+    localStorage.removeItem('sub_' + i);
+
+  removeItem('fol_count');
+  removeItem('sub_count');
+
+}
 
 function loadState() {
-
 
   loadButtonState(sub);
   loadButtonState(modAsSub);
@@ -397,27 +398,23 @@ function loadState() {
   prepareButton(vipAsSub);
   prepareButton(subsOnly);
   prepareButton(duplicateCheck);
-
-  flCnt = Number(localStorage.getItem('fol_count'));
-  sbCnt = Number(localStorage.getItem('sub_count'));
-
-  for (let i = 1; i <= flCnt; i++) {
-
-    var entryString = localStorage.getItem('fol_' + i);
-    var entry = loadEntry(entryString);
-    addEntry(entry);
-    folEntries[entry.name] = entry;
   
+  var lastListName = localStorage.getItem('last_list_name');
+  if (lastListName != null && lastListName === LIST_NAME) {
+    // last time we could not save the list data on the server, so we load backup from local storage
+    
+    loadStateLocalStorage();
+
+  } else {
+    // last time server save was sucessful, so we just clear backup data to be ready to take new ones
+
+    deleteStateLocalStorage();
+
   }
 
-  for (let i = 1; i <= sbCnt; i++) {
-   
-    var entryString = localStorage.getItem('sub_' + i);
-    var entry = loadEntry(entryString);
-    addEntry(entry);
-    subEntries[entry.name] = entry;
-  
-  }
+  localStorage.removeItem('last_list_name');
+
+  // api/subapp/get
 
 }
 
@@ -435,7 +432,8 @@ function init() {
   subIconsMonths = tmp.months;
 
   // init consts
-  CHANNEL = 'Krabick';// readCookie('channel');
+  LIST_NAME = 'default';
+  CHANNEL = 'gaules';// readCookie('channel');
   MAX_CHOICE_LENGTH = 60;
 
   // init vars
@@ -547,19 +545,59 @@ function logLocalStorageSpace() {
 
 function serverSaveTimer() {
 
+  // delete later
   displayError('Could not save data! Alert!');
 
   if (saveInterval < 1) return;
   window.setTimeout(serverSaveTimer, saveInterval * 1000);
+
+  if (isHashEmpty(newFolEntries) && isHashEmpty(newSubEntries)) return;
   
   // send new data to server and empty buffers
   
-  if (isHashEmpty(newFolEntries) && isHashEmpty(newSubEntries))
-    return;
+  jsonBody = '{ user: "' + CHANNEL + '", listName: "' + LIST_NAME + '", requestData: "';
+  
+  // ? functions ?
+  for (fol in newFolEntries) {
+    jsonBody += '(' + newFolEntries[fol].name + ', ' + false + ', ' + newFolEntries[fol].months + ', ' + newFolEntries[fol].choice + '), ';
+  }
 
-  console.log('[SERVER_SAVE]\n')
-  console.log(newFolEntries);
-  console.log(newSubEntries);
+  for (sub in newFolEntries) {
+    jsonBody += '(' + newFolEntries[sub].name + ', ' + true + ', ' + newFolEntries[sub].months + ', ' + newFolEntries[sub].choice + '), ';
+  }
+
+  jsonBody = jsonBody.substring(0, jsonBody.length - 2); // meh
+
+  jsonBody += '"}';
+
+  header = {};
+  header.key = 'token';
+  header.value = localStorage.getItem('token');
+  
+  console.log(jsonBody);
+
+  return;
+
+  httpPost('api/subapp/save', callback, body, header);
+  
+  function callback(response) {
+
+    console.log(response);
+    if (error) {
+      displayError(error.toString());
+      
+      appendHash(newFolEntries, tmpFol);
+      appendHash(newSubEntries, tmpSub);
+
+    }
+
+    tmpFol = null;
+    tmpSub = null;
+
+  }
+
+  tmpFol = copyHash(newFolEntries);
+  tmpSub = copyHash(newSubEntries);
 
   newFolEntries = {};
   newSubEntries = {};
@@ -572,6 +610,26 @@ function isHashEmpty(hash) {
     return false;
 
   return true;
+
+}
+
+function copyHash(hash) {
+
+  var copy = {};
+
+  for (x in hash)
+    if (hash.hasOwnProperty(x))
+      copy[x] = hash[x];
+
+  return copy;
+
+}
+
+function appendHash(target, source) {
+
+  for (x in target)
+    if (source.hasOwnProperty(x))
+      target[x] = source[x];
 
 }
 

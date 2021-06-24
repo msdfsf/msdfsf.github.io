@@ -16,7 +16,7 @@ function httpGet(url, callback, headers, sync = false) {
 
 }
 
-function httpPost(url, callback, headers, sync = false) {
+function httpPost(url, callback, headers, body, sync = false) {
     
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() { 
