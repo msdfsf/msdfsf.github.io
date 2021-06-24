@@ -506,6 +506,7 @@ function init() {
   errorField.style.height = '600px';
   errorField.MAX_ERRORS = 4;
   errorField.ERROR_HEIGHT = 600 / errorField.MAX_ERRORS;
+  errorField.TTL = 3; // in s
 
   document.body.appendChild(errorField);
 
@@ -571,7 +572,7 @@ function displayError(errorMessage) {
 
   console.log('[ERROR] ' + errorMessage);
 
-  var container = document.createElement('div');
+  var container = document.createElement('ttl');
   container.style.position = 'relative';
   container.style.display = 'block';
   container.style.backgroundColor = 'red';
@@ -585,5 +586,11 @@ function displayError(errorMessage) {
   }
 
   errorField.appendChild(container);
+
+  setTimeout(function() {
+
+    errorField.removeChild(container);
+  
+  }, errorField.TTL * 1000);
 
 }
