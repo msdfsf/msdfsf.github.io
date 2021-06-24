@@ -512,7 +512,7 @@ function init() {
 
   errorField.MAX_ERRORS = 4;
   errorField.ERROR_HEIGHT = 600 / errorField.MAX_ERRORS;
-  errorField.TTL = 10; // in s
+  errorField.TTL = 4; // in s
   errorField.errorsCount = 0;
 
   document.body.appendChild(errorField);
@@ -580,7 +580,7 @@ function displayError(errorMessage) {
 
   console.log('[ERROR] ' + errorMessage);
 
-  let container = document.createElement('div');
+  var container = document.createElement('div');
 
   container.style.color           = 'white';
   container.style.backgroundColor = '#FF3333';
@@ -597,7 +597,8 @@ function displayError(errorMessage) {
   container.style.flexDirection   = 'row';
   container.style.alignItems      = 'center';
   container.style.justifyContent  = 'start';
-  container.style.transition      = 'all 0.5s, ease-out';
+  container.style.transition      = 'transform 1s, opacity 0.5s';
+  container.style.transform       = 'translateX(200px)';
 
   var symbol = document.createElement('img');
 
@@ -626,19 +627,20 @@ function displayError(errorMessage) {
 
   setTimeout(function() {
 
-    container.style.marginTop      = '2px';
+    container.style.transform = 'translateX(0px)';
 
-  }, 20);
-
-
-
+  }, 1);
 
   errorField.errorsCount++;
 
   container.ttlTmr = setTimeout(function() {
 
-    errorField.removeChild(container);
-    errorField.errorsCount--;
+    container.style.opacity = 0;
+
+    setTimeout(function() {
+      errorField.removeChild(container);
+      errorField.errorsCount--;
+    }, 500);
 
   }, errorField.TTL * 1000);
 
