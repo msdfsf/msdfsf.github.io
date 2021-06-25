@@ -324,6 +324,8 @@ function prepareTextBox(textBoxID) {
 
 function loadEntry(entryString) {
 
+  if (entryString == null) return;
+
   var props = entryString.split(' ', 4);
   props.push(entryString.slice(props[0].length + props[1].length + props[2].length + 4));
 
