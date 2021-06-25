@@ -55,7 +55,6 @@ body {
     height: 100%;
     color: white;
     background-color: #131313;
-    position: relative;
     display: inline-block;
     transition: 0.5s;
     opacity: 1;
@@ -97,9 +96,6 @@ body {
     background-color: #131313;
     position: relative;
     box-sizing: border-box;
-    border-color: transparent;
-    border-style: solid;
-    border-radius: 10px;
     overflow-y: scroll;
 }
 
