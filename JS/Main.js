@@ -436,7 +436,7 @@ function init() {
 
   // init consts
   LIST_NAME = 'default';
-  CHANNEL = 'msdfsf';// readCookie('channel');
+  CHANNEL = 'melharucos';// readCookie('channel');
   MAX_CHOICE_LENGTH = 60;
 
   // init vars
