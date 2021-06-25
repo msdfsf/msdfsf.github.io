@@ -9,7 +9,7 @@
       var token = localStorage.getItem('token');
       // api/user/me call have to be here...
 
-      var isPremium = false; // suppose we have this value
+      var isPremium = true; // suppose we have this value
 
       if (!isPremium) window.location.replace(ROOT_URL + '/crossroad.html');
       
@@ -636,8 +636,19 @@
     </script>
 
     <script> 
+      
       init();
-      loadStateLocalStorage(); // exchange later for loadState();  
+      loadStateLocalStorage(); // exchange later for loadState();
+
+      window.addEventListener('beforeunload', function(event) {
+        
+        saveNewData(true);
+        if (localStorage.getItem('last_list_name') != null) {
+          alert('Unable to save data to the server!')
+        }
+
+      }, false);
+
     </script>
     
   </body>

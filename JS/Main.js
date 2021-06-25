@@ -34,17 +34,6 @@ var saveInterval;
 var CHANNEL;
 var MAX_CHOICE_LENGTH;
 
-var entry = {
-  name: 'HUI',
-  choice: 'SOSAT',
-  sub: false,
-  months: 0,
-  displayName: 'Hui',
-  displayChoice: 'Sosat',
-  li: null,
-  id: -1
-}
-
 var folCount = 0;
 var subCount = 0;
 
@@ -270,7 +259,7 @@ function saveState(entry) {
 
   }
 
-  localStorage.setItem(id, entry.name + ' ' + entry.sub + ' ' + entry.months + ' ' + entry.displayName + ' ' + entry.choice);
+  localStorage.setItem(id, entry.displayName + ' ' + entry.sub + ' ' + entry.months + ' ' + entry.choice);
 
 }
 
@@ -286,6 +275,9 @@ function removeEntry(entry) {
     delete subEntries[entry.name];
     subCount--;
     localStorage.setItem('sub_count', subCount);
+
+    entry.choice = '';
+    newSubEntries[entry.name] = entry;
   
   } else {
 
@@ -293,6 +285,9 @@ function removeEntry(entry) {
     delete subEntries[entry.name];
     folCount--;
     localStorage.setItem('fol_count', folCount);
+
+    entry.choice = '';
+    newFolEntries[entry.name] = entry;
 
   }
 
@@ -330,14 +325,14 @@ function prepareTextBox(textBoxID) {
 function loadEntry(entryString) {
 
   var props = entryString.split(' ', 4);
-  props.push(entryString.slice(props[0].length + props[1].length + props[2].length + props[3].length + 4));
+  props.push(entryString.slice(props[0].length + props[1].length + props[2].length + 4));
 
   var entry = {};
-  entry.name = props[0];
-  entry.choice = props[4];
+  entry.name = props[0].toLowerCase();
+  entry.choice = props[3];
   entry.sub = props[1] === 'true';
   entry.months = Number(props[2]);
-  entry.displayName = props[3];
+  entry.displayName = props[0];
   entry.displayChoice = entry.choice;
 
   return entry;
@@ -551,6 +546,12 @@ function serverSaveTimer() {
   if (saveInterval < 1) return;
   window.setTimeout(serverSaveTimer, saveInterval * 1000);
 
+  saveNewData();
+
+}
+
+function saveNewData(sync = false) {
+
   if (isHashEmpty(newFolEntries) && isHashEmpty(newSubEntries)) return;
   
   // send new data to server and empty buffers
@@ -576,9 +577,9 @@ function serverSaveTimer() {
   
   console.log(jsonBody);
 
-  return;
+  return; // remove later
 
-  httpPost('api/subapp/save', callback, body, header);
+  httpPost('api/subapp/save', callback, body, header, sync);
   
   function callback(response) {
 
@@ -589,6 +590,12 @@ function serverSaveTimer() {
       appendHash(newFolEntries, tmpFol);
       appendHash(newSubEntries, tmpSub);
 
+      localStorage.setItem('last_list_name', LIST_NAME);
+
+    } else {
+
+      localStorage.removeItem('last_list_name');
+    
     }
 
     tmpFol = null;
@@ -629,7 +636,8 @@ function appendHash(target, source) {
 
   for (x in target)
     if (source.hasOwnProperty(x))
-      target[x] = source[x];
+      if (target[x] == null)
+        target[x] = source[x];
 
 }
 
