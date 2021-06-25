@@ -375,8 +375,8 @@ function deleteStateLocalStorage() {
   for (let i = 1; i <= sbCnt; i++)
     localStorage.removeItem('sub_' + i);
 
-  removeItem('fol_count');
-  removeItem('sub_count');
+  localStorage.removeItem('fol_count');
+  localStorage.removeItem('sub_count');
 
 }
 
