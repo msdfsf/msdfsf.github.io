@@ -721,7 +721,7 @@ function displayError(errorMessage) {
 
     container.style.opacity = 0;
 
-    setTimeout(function() {
+    container.ttlTmr = setTimeout(function() {
       errorField.removeChild(container);
       errorField.errorsCount--;
     }, 500);
