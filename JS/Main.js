@@ -324,7 +324,7 @@ function prepareTextBox(textBoxID) {
 
 function loadEntry(entryString) {
 
-  if (entryString == null) return;
+  if (entryString == null) return null;
 
   var props = entryString.split(' ', 4);
   props.push(entryString.slice(props[0].length + props[1].length + props[2].length + 4));
@@ -350,6 +350,8 @@ function loadStateLocalStorage() {
 
     var entryString = localStorage.getItem('fol_' + i);
     var entry = loadEntry(entryString);
+    if (entry == null) continue;
+
     addEntry(entry);
     folEntries[entry.name] = entry;
   
@@ -359,6 +361,8 @@ function loadStateLocalStorage() {
    
     var entryString = localStorage.getItem('sub_' + i);
     var entry = loadEntry(entryString);
+    if (entry == null) continue;
+    
     addEntry(entry);
     subEntries[entry.name] = entry;
   
