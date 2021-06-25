@@ -380,6 +380,14 @@ function deleteStateLocalStorage() {
 
 }
 
+function clearList() {
+
+  deleteStateLocalStorage();
+  // httpPost('antifun.club/api/subapp/delete');
+  window.location.reload(false); 
+
+}
+
 function loadState() {
 
   loadButtonState(sub);
