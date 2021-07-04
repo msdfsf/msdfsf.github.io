@@ -30,7 +30,7 @@ function httpPost(url, callback, headers, body, sync = false) {
         xmlHttp.setRequestHeader(headers[i].key, headers[i].value);
     }
 	
-	xmlHttp.send(null);
+	xmlHttp.send(body);
 
 }
 
