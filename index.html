@@ -2,16 +2,20 @@
 <html>
   <head>
 
+    <script src = "Config.cfg"></script>
+    <script src = "JS/RequestHandler.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+    
     <script>
 
-      const ROOT_URL  = 'https://msdfsf.github.io';
-
-      var token = localStorage.getItem('token');
+      var token = getUrlParam('token');
+      CryptoJS.AES.encrypt((token == null) ? '' : token, cfg.SECRET_KEY).toString();
       // api/user/me call have to be here...
 
       var isPremium = true; // suppose we have this value
 
-      if (!isPremium) window.location.replace(ROOT_URL + '/crossroad.html');
+      if (!isPremium) window.location.replace(cfg.ROOT_URL + '/crossroad.html');
       
     </script>
     
@@ -381,13 +385,10 @@
 
     </style>
 
-    <script src = "Config.cfg"></script>
-
     <script src = "JS/tmi.min.js"></script>
     <script src = "JS/TwitchBot.js"></script>
     <script src = "JS/Main.js"></script>
     <script src = "JS/AnimationAndStuff.js"></script>
-    <script src = "JS/RequestHandler.js"></script>
     <script src = "JS/FileHandler.js"></script>
     <script src = "JS/PopupMenu.js"></script>
 	

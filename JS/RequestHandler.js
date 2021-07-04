@@ -34,6 +34,47 @@ function httpPost(url, callback, headers, body, sync = false) {
 
 }
 
+function getUrlParam(name, url = window.location.href) {
+
+    var startIdx = url.findIndex('?') + 1;
+    for (i = startIdx; i < url.length; i++) {
+
+        if (url[i] === '=') {
+
+            var paramName = url.substring(startIdx, i);
+            if (paramName === name) {
+                
+                startIdx = i + 1;
+                for (j = startIdx; j < url.length; j++) {
+                    if (url[j] === '&') {
+                        return url.substring(startIdx, j);
+                    }
+                }
+
+                if (j === url.length) {
+                    return url.substring(startIdx, j);
+                }
+
+                return null;
+
+            }
+
+            for (j = i + 1; j < url.length; j++) {
+                if (url[j] === '&') {
+                    i = j + 1;
+                    startIdx = i;
+                    break;
+                }
+            }
+        
+        }
+
+    }
+
+    return null;
+
+}
+
 function setCookie(name,value,days) {
     var expires = "";
     if (days) {
