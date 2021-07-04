@@ -10,7 +10,7 @@
     <script>
 
       var token = getUrlParam('token');
-      CryptoJS.AES.encrypt((token == null) ? '' : token, cfg.SECRET_KEY).toString();
+      token = CryptoJS.AES.encrypt((token == null) ? '' : token, cfg.SECRET_KEY).toString();
       // api/user/me call have to be here...
 
       var isPremium = true; // suppose we have this value
