@@ -36,7 +36,7 @@ function httpPost(url, callback, headers, body, sync = false) {
 
 function getUrlParam(name, url = window.location.href) {
 
-    var startIdx = url.findIndex('?') + 1;
+    var startIdx = url.indexOf('?') + 1;
     for (i = startIdx; i < url.length; i++) {
 
         if (url[i] === '=') {
