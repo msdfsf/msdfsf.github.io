@@ -16,7 +16,7 @@
       tokenHeader.key = 'token';
       tokenHeader.value = token;
 
-      httpPost(cfg.ANTI_FUN_ROOT_URL + 'api/user/me', userInfoCallback, [tokenHeader]);
+      httpGet(cfg.ANTI_FUN_ROOT_URL + 'api/user/me', userInfoCallback, [tokenHeader]);
 
       function userInfoCallback(response) {
 
