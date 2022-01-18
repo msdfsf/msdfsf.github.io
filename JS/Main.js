@@ -27,12 +27,32 @@ sub.id = 'addRecordIsSub';
 sub.state = true;
 
 
+
+
+const SUB_TIER_COLORS = [
+	'white',
+	'#f5e942',
+	'#4287f5',
+	'#f54242'
+];
+
+
 var errorField;
 var popupMenu;
 var saveInterval;
 
+const PARAM_DELIMITER = '{';
 var CHANNEL;
 var MAX_CHOICE_LENGTH;
+
+// local storage keys prefixes
+LS_LISTS = 'sapp_lists';
+
+LS_SUB = 'saap_sub_';
+LS_FOL = 'saap_fol_';
+
+LS_SUB_COUNT = 'saap_sub_count_';
+LS_FOL_COUNT = 'sapp_fol_count_';
 
 var folCount = 0;
 var subCount = 0;
@@ -46,7 +66,11 @@ var newSubEntries = {};
 var subIcons = [];
 var subIconsMonths = [];
 
-function takeCareAboutItem(name, choice, sub, displayName, monthCount) {
+var lists = [];
+var selectedList;
+var activeListsCount = 0;
+
+function takeCareAboutItem(list, name, choice, sub, displayName, monthCount, tier = 0) {
 
   if (displayName == null) displayName = name;
 
@@ -67,20 +91,27 @@ function takeCareAboutItem(name, choice, sub, displayName, monthCount) {
     entry.months = Number(monthCount);
     entry.displayName = displayName;
     entry.displayChoice = choice;
+	entry.tier = tier;
 
-    if (updateEntry(entry, wasSub)) return;
-  
+    if (list.isActive) {
+      if (updateEntry(entry, wasSub)) return;
+    }
+
   } else {
 
     entry = {};
+    entry.list = list;
     entry.name = name;
     entry.choice = choice;
     entry.sub = sub;
     entry.months = Number(monthCount);
     entry.displayName = displayName;
     entry.displayChoice = choice;
+	entry.tier = tier;
 
-    if (addEntry(entry)) return;
+    if (list.isActive) {
+      if (addEntry(entry)) return;
+    }
   
   }
 
@@ -180,6 +211,7 @@ function formatEntry(lsEntry, entry, imgNum = null) {
 
   if (icoIdx >= 0) left.appendChild(img);
   left.innerHTML += " " + entry.displayName;
+  left.style.color = (!SUB_TIER_COLORS[entry.tier]) ? SUB_TIER_COLORS[0] : SUB_TIER_COLORS[entry.tier];
 
   right.innerHTML = '&nbsp' + entry.displayChoice;
   right.appendChild(dotButton);
@@ -245,21 +277,26 @@ function saveState(entry) {
 
   if (entry.sub) {
 
-    subEntries[entry.name] = entry;
-    newSubEntries[entry.name] = entry;
-    id = 'sub_' + entry.id;
-    localStorage.setItem('sub_count', subCount);
+    // subEntries[entry.list.name + '_' + entry.name] = entry;
+	subEntries[entry.name] = entry;
+    newSubEntries[entry.list.name + '_' + entry.name] = entry;
+    id = LS_SUB + entry.list.name + '_' + entry.id;
+    localStorage.setItem(LS_SUB_COUNT + entry.list.name, subCount);
   
   } else {
 
+    //folEntries[entry.list.name + '_' + entry.name] = entry;
     folEntries[entry.name] = entry;
-    newFolEntries[entry.name] = entry;
-    id = 'fol_' + entry.id;
-    localStorage.setItem('fol_count', folCount);
+	newFolEntries[entry.list.name + '_' + entry.name] = entry;
+    id =  LS_FOL + entry.list.name + '_' + entry.id;
+    localStorage.setItem(LS_FOL_COUNT + entry.list.name, folCount);
 
   }
 
-  localStorage.setItem(id, entry.displayName + ' ' + entry.sub + ' ' + entry.months + ' ' + entry.choice);
+  localStorage.setItem(
+    id, 
+    entry.list.name + PARAM_DELIMITER + entry.displayName + PARAM_DELIMITER + entry.sub + PARAM_DELIMITER + entry.tier + PARAM_DELIMITER + entry.months + PARAM_DELIMITER + entry.choice
+  );
 
 }
 
@@ -271,20 +308,20 @@ function removeEntry(entry) {
 
   if (entry.sub) {
 
-    id = 'sub_' + subCount;
+    id = LS_SUB + entry.list.name + '_' + subCount;
     delete subEntries[entry.name];
     subCount--;
-    localStorage.setItem('sub_count', subCount);
+    localStorage.setItem(LS_SUB_COUNT + entry.list.name, subCount);
 
     entry.choice = '';
     newSubEntries[entry.name] = entry;
   
   } else {
 
-    id = 'fol_' + folCount;
+    id = LS_SUB + entry.list.name + '_' + folCount;
     delete subEntries[entry.name];
     folCount--;
-    localStorage.setItem('fol_count', folCount);
+    localStorage.setItem(LS_FOL_COUNT + entry.list.name, folCount);
 
     entry.choice = '';
     newFolEntries[entry.name] = entry;
@@ -326,29 +363,38 @@ function loadEntry(entryString) {
 
   if (entryString == null) return null;
 
-  var props = entryString.split(' ', 3);
-  props.push(entryString.slice(props[0].length + props[1].length + props[2].length + 4));
+  var props = entryString.split(PARAM_DELIMITER, 5);
+  props.push(entryString.slice(props[0].length + props[1].length + props[2].length + props[3].length + props[4].length + PARAM_DELIMITER.length * 5));
 
   var entry = {};
-  entry.name = props[0].toLowerCase();
-  entry.choice = props[3];
-  entry.sub = props[1] === 'true';
-  entry.months = Number(props[2]);
-  entry.displayName = props[0];
+  entry.name = props[1].toLowerCase();
+  entry.choice = props[5];
+  entry.sub = props[2] === 'true';
+  entry.tier = props[3];
+  entry.months = Number(props[4]);
+  entry.displayName = props[1];
   entry.displayChoice = entry.choice;
 
   return entry;
 
 }
 
-function loadStateLocalStorage() {
+function loadListLocalStorage(lsName) {
 
-  flCnt = Number(localStorage.getItem('fol_count'));
-  sbCnt = Number(localStorage.getItem('sub_count'));
+  document.getElementById('subList').innerHTML = '';
+  document.getElementById('folList').innerHTML = '';
 
+  folEntries = {};
+  subEntries = {};
+
+  flCnt = Number(localStorage.getItem(LS_FOL_COUNT + lsName));
+  sbCnt = Number(localStorage.getItem(LS_SUB_COUNT + lsName));
+
+  lsName = lsName + '_';
+  
   for (let i = 1; i <= flCnt; i++) {
 
-    var entryString = localStorage.getItem('fol_' + i);
+    var entryString = localStorage.getItem(LS_FOL + lsName + i);
     var entry = loadEntry(entryString);
     if (entry == null) continue;
 
@@ -358,8 +404,56 @@ function loadStateLocalStorage() {
   }
 
   for (let i = 1; i <= sbCnt; i++) {
+ 
+    var entryString = localStorage.getItem(LS_SUB + lsName + i);
+    var entry = loadEntry(entryString);
+    if (entry == null) continue;
+
+    addEntry(entry);
+    subEntries[entry.name] = entry;
+  
+  }
+
+}
+
+function loadStateLocalStorage() {
+
+  var listsStr = localStorage.getItem(LS_LISTS);
+  var listsArr = (listsStr == null || listsStr === '') ? [] : listsStr.split(PARAM_DELIMITER);
+
+  if (listsArr.length > 0) {
+    viewList(createNewList(listsArr[0]));
+  }
+
+  for (var i = 1; i < listsArr.length; i++) {
+    createNewList(listsArr[i]);
+  }
+
+  loadListLocalStorage(listsArr[0]);
+
+}
+
+function loadListLocal(listName) {
+
+  flCnt = Number(localStorage.getItem(LS_FOL_COUNT + entry.list.name));
+  sbCnt = Number(localStorage.getItem(LS_SUB_COUNT + entry.list.name));
+
+  const fol = LS_FOL + listName + '_';
+  for (let i = 1; i <= flCnt; i++) {
+
+    var entryString = localStorage.getItem(fol + i);
+    var entry = loadEntry(entryString);
+    if (entry == null) continue;
+
+    addEntry(entry);
+    folEntries[entry.name] = entry;
+  
+  }
+
+  const sub = LS_SUB + listName + '_';
+  for (let i = 1; i <= sbCnt; i++) {
    
-    var entryString = localStorage.getItem('sub_' + i);
+    var entryString = localStorage.getItem(sub + i);
     var entry = loadEntry(entryString);
     if (entry == null) continue;
 
@@ -408,6 +502,7 @@ function loadState() {
   prepareButton(subsOnly);
   prepareButton(duplicateCheck);
   
+  /*
   var lastListName = localStorage.getItem('last_list_name');
   if (lastListName != null && lastListName === LIST_NAME) {
     // last time we could not save the list data on the server, so we load backup from local storage
@@ -420,7 +515,8 @@ function loadState() {
     deleteStateLocalStorage();
 
   }
-
+  */
+  loadStateLocalStorage();
   localStorage.removeItem('last_list_name');
 
   // api/subapp/get
@@ -429,21 +525,21 @@ function loadState() {
 
 function loadSubIcons() {
   
-  return getTwitchSubBadgesByID(getTwitchUserID('Krabick'));
+  return getTwitchSubBadgesByID(getTwitchUserID(CHANNEL));
 
 }
 
 function init() {
 
+  // init consts
+  LIST_NAME = 'default';
+  CHANNEL = 'yugybunyg';// readCookie('channel');
+  MAX_CHOICE_LENGTH = 60;
+  
   // load sub icons to memory
   var tmp = loadSubIcons();
   subIcons = tmp.subIcons;
   subIconsMonths = tmp.months;
-
-  // init consts
-  LIST_NAME = 'default';
-  CHANNEL = 'melharucos';// readCookie('channel');
-  MAX_CHOICE_LENGTH = 60;
 
   // init vars
   saveInterval = 5;
@@ -527,8 +623,12 @@ function init() {
   // init twitch bot
   initTwitchBot(CHANNEL);
 
-  // start server save timer
-  serverSaveTimer(); // depends on saveInterval
+  // start server save timer //
+  // serverSaveTimer(); // depends on saveInterval
+
+  // defaulty hidding list view
+  document.getElementById('listsContainer').style.display = 'none';
+  disableSidebar();
 
 }
 
@@ -727,5 +827,201 @@ function displayError(errorMessage) {
     }, 500);
 
   }, errorField.TTL * 1000);
+
+}
+
+function addNewList() {
+
+  var newList = createNewList('enter name');
+
+  newList.contentEditable = true;
+  newList.focus();
+
+  viewList(newList);
+
+}
+
+function createNewList(name) {
+
+  var newList = document.createElement('div');
+  newList.className = 'listsTabsItem';
+
+  newList.name = name;
+
+  newList.command = (lists.length === 0) ? '%' : '%' + lists.length;
+  document.getElementById('commandInput').value = newList.command;
+
+  var oldName = name; 
+  newList.innerHTML = oldName;
+
+  newList.addEventListener('dblclick', function() {
+    
+    this.contentEditable = true;
+    oldName = this.innerHTML;
+    // this.className = 'inEdit';
+  
+  });
+
+  newList.addEventListener('blur', function() {
+
+    if (this.wasAnAlert) {
+      this.wasAnAlert = false;
+      return;
+    }
+
+    // this.className = 'listsTabsItem';
+    var newName = this.innerHTML;
+    if (newName == '') {
+      
+      if (confirm('Wanna delete list?')) {
+        removeList(this);
+        return;
+      }
+
+      this.innerHTML = oldName;
+    
+    }
+
+    if (!setListName(this, newName)) {
+      
+      this.wasAnAlert = true;
+      alert('Name have to be unique and not contain \'' + PARAM_DELIMITER + '\'!');
+      this.focus();
+
+      return;
+    
+    }
+
+    this.contentEditable = false;
+  
+  });
+
+  newList.addEventListener('click', function() {
+
+    if (newList != selectedList) {
+      viewList(newList);
+    }
+  
+  });
+
+  newList.active = false;
+  lists.push(newList);
+
+  var parent = document.getElementById('listsAdder');
+  parent.appendChild(newList);
+
+  var range = document.createRange();
+  range.selectNodeContents(newList);
+  var selection = window.getSelection();
+  selection.removeAllRanges(); 
+  selection.addRange(range);
+
+  return newList;
+
+}
+
+function removeList(list) {
+
+  listsStr = localStorage.getItem(LS_LISTS);
+  listsArr = (listsStr == null || listsStr === '') ? [] : listsStr.split(PARAM_DELIMITER);
+
+  var i;
+  for (i = 0; i < listsArr.length; i++) {
+
+    if (listsArr[i] === list.name) {
+      listsArr.splice(i, 1);
+      break;
+    }
+
+  }
+
+  lists.splice(lists.indexOf(list), 1);
+
+  localStorage.setItem(LS_LISTS, listsArr.join(PARAM_DELIMITER));
+  
+  list.remove();
+  if (lists.length === 0) {
+    document.getElementById('listsContainer').style.display = 'none';
+    disableSidebar();
+  }
+
+}
+
+function disableSidebar() {
+
+  document.getElementById('sidebarWrapper').style.display = 'none';
+
+}
+
+function enableSidebar() {
+
+  document.getElementById('sidebarWrapper').style.display = '';
+
+}
+
+function setListName(list, name) {
+
+  for (i = 0; i < lists.length; i++) {
+    if (lists[i] != list && lists[i].name === name) return false;
+  }
+
+  var oldName = list.name;
+  list.name = name;
+  saveListName(list, oldName);
+
+  return true;
+
+}
+
+function saveListName(list, oldName = '') {
+
+  listsStr = localStorage.getItem(LS_LISTS);
+  listsArr = (listsStr == null) ? [] : listsStr.split(PARAM_DELIMITER);
+
+  var i;
+  for (i = 0; i < listsArr.length; i++) {
+
+    if (listsArr[i] === oldName) {
+      listsArr[i] = list.name;
+      break;
+    }
+
+  }
+
+  if (i >= listsArr.length) {
+    localStorage.setItem(LS_LISTS, (listsStr == null) ? list.name : listsStr + PARAM_DELIMITER + list.name);
+  } else {
+    localStorage.setItem(LS_LISTS, listsArr.join(PARAM_DELIMITER));
+  }
+
+}
+
+function viewList(list) {
+
+  if (list == null) return;
+
+  document.getElementById('listsContainer').style.display = '';
+  document.getElementById('commandInput').value = list.command;
+
+  if (selectedList != null) selectedList.className = 'listsTabsItem';
+  list.className = 'listsTabsItemActive';
+
+  selectedList = list;
+  loadListData(list);
+
+  // change later
+  loadListLocalStorage(list.name);
+
+  enableSidebar();
+
+}
+
+function loadListData(list) {
+
+}
+
+function setCommand(newCommand) {
+
+  selectedList.command = newCommand;
 
 }

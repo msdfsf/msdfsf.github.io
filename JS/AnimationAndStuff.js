@@ -41,6 +41,27 @@ function changeDuplicateCheck() {
 
 function changeCollectRequests() {
     changeButtonStateAndName(collectRequests, 'Collect Requests', 'Stop Request Collecting');
+    
+    if (collectRequests.state) {
+        
+        activeListsCount++;
+        
+        if (lists.length > activeListsCount) {
+
+            firstInactive = lists[activeListsCount];
+            lists[lists.indexOf(selectedList)] = firstInactive; // indexOf has to be changed, but ok
+            lists[activeListsCount] = selectedList;
+        
+        }
+    
+    } else {
+
+        activeListsCount--;
+
+    }
+
+    selectedList.isActive = collectRequests.state;
+
 }
 
 function changeButtonState(button) {

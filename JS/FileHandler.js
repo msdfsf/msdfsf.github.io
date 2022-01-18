@@ -130,6 +130,14 @@ function exportAsCSV() {
   }
 
   downloadData(csv, dataType, 'FolSubList.csv');
+  
+}
+
+function exportMarbles() {
+	var list = [];
+	list = Array.prototype.concat.apply(list, document.getElementById('subList').getElementsByTagName('li'));
+	list = Array.prototype.concat.apply(list, document.getElementById('folList').getElementsByTagName('li'));
+	exportAsTXT(list, 'usernames.csv', '', '"', '"');
 }
 
 function exportSubAsTXT() {
@@ -147,17 +155,32 @@ function exportFolAsTXT() {
 
 }
 
-function exportAsTXT(list, name) {
+function exportAsTXT(list, name, del = ': ', leftBound = '', rightBound = '') {
 
   if (list.length < 1) return;
 
   const dataType = "data:text/txt;charset=utf-8,%EF%BB%BF";
 
-  var txt = list[0].entry.displayName + ': ' + list[0].entry.choice;
+  var coef = 1;
+  if (list[0].entry.tier == 2) coef = TIER_2_COEF;
+  else if (list[0].entry.tier == 3) coef = TIER_3_COEF;
+  
+  var txt = (coef > 0) ? leftBound + list[0].entry.displayName + del + list[0].entry.choice + rightBound : '';
+  for (let j = 1; j < coef; j++) {
+	  txt += '\r\n' + leftBound + list[0].entry.displayName + del + list[0].entry.choice + rightBound;
+  }
+  
   for (let i = 1; i < list.length; i++) {
-        
-    entry = list[i].entry;
-    txt += '\r\n' + entry.displayName + ': ' + entry.choice;
+    
+	var entry = list[i].entry;
+	
+	var coef = 1;
+	if (entry.tier == 2) coef = TIER_2_COEF;
+	else if (entry.tier == 3) coef = TIER_3_COEF;
+	
+	for (let j = 0; j < coef; j++) {
+		txt += '\r\n' + leftBound + entry.displayName + del + entry.choice + rightBound;
+	}
   
   }
 

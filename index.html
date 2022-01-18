@@ -4,31 +4,6 @@
 
     <script src = "Config.cfg"></script>
     <script src = "JS/RequestHandler.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-    
-    <script>
-
-      var token = getUrlParam('token');
-      token = CryptoJS.AES.decrypt((token == null) ? '' : token, cfg.SECRET_KEY).toString();
-
-      var tokenHeader = {};
-      tokenHeader.key = 'token';
-      tokenHeader.value = token;
-
-      httpGet(cfg.ANTI_FUN_ROOT_URL + 'api/user/me', userInfoCallback, [tokenHeader]);
-
-      function userInfoCallback(response) {
-
-        console.log(response);
-      
-      }
-
-      var isPremium = true; // suppose we have this value
-
-      if (!isPremium) window.location.replace(cfg.ROOT_URL + '/crossroad.html');
-      
-    </script>
     
     <meta content = 'text/html; charset = UTF-8'>
 
@@ -40,6 +15,8 @@
 
         width: 80%;
         height: 90%;
+        display: flex;
+        flex-flow: column;
 
       }
       
@@ -215,7 +192,7 @@
         margin-bottom: 5%;
       }
 
-      .sidebarLabel {
+      .sidebarLabel, .textInput {
         box-sizing: border-box;
         color: white;
         line-height: 30px;
@@ -227,6 +204,10 @@
         border-style: solid;
         border-width: 1px;
 
+      }
+
+      .textInput {
+        outline: none;
       }
 
       .dotButton {
@@ -406,10 +387,22 @@
   </head>
 
   <body>
+  
+	<script>
+		// global vars
+		
+		var TIER_2_COEF = 2;
+		var TIER_3_COEF = 5;
+	</script>
 
-    <div id = "notSideBar" class = 'notSideBar' onclick = "clickToggleSidebar()">
+    <div id = "notSideBar" class = 'notSideBar'>
 
-      <div class = 'listsContainer'>
+      <div class = 'listsTabs'>
+        <div class = 'liststTabOverflowHelper' id = 'listsAdder'>
+          <div class = 'listsTabsItem' onclick = 'addNewList()'>+</div>
+        </div>
+      </div>
+      <div id = 'listsContainer' class = 'listsContainer'>
 
           <div id = 'folListFull' class = 'listContainer'>
             <div class = 'listTitle'>Followers</div>
@@ -429,12 +422,34 @@
     </div>
 
     <div id = "sidebarBehind" class = "sidebar sidebarBehind"></div>
-      
+	
     <div id = "sidebar" class = "sidebar">
 
       <div class = "toggleButton" onclick = "toggleSidebar()">
         &#9776
       </div>
+	  
+	  <div class = 'sidebarWrapper'>
+		  <div class = "sidebarControls">
+			  <button id = "globalMenu" onclick = "" class = "flatButton addButton sidebarRightCol">Global Options</button
+			  ><button id = "localMenu" onclick = "" class = "flatButton addButton sidebarLeftCol">Local Options</button>
+		  </div>
+	  <div id = 'sidebarWrapperGlobal' class = 'sidebarWrapper'>
+	  
+	  <div id = 'sidebarWrapperGlobal' class = 'sidebarWrapper'>
+
+      <p class = "sidebarTitle"> Set Background </p>
+      <div class = "sidebarControls">
+    
+        <button id = "collectRequests" onclick = "changeCollectRequests()" class = "flatButton sidebarFullRow">Collect Requests</button>
+        <button id = "addRecordTrigger" onclick = "displayAddRecord()" class = "flatButton addButton sidebarFullRow">Add Record</button>
+        <button id = "resetButton" onclick = "clearList();" class = "flatButton resetButton sidebarFullRow">Reset</button>
+
+      </div>
+
+      </div>
+	  
+      <div id = 'sidebarWrapper' class = 'sidebarWrapper'>
 
       <p class = "sidebarTitle"> Controls </p>
       <div class = "sidebarControls">
@@ -457,14 +472,25 @@
         <button id = "hideSub" onclick = "changeHideSub(this)" class = "flatButton sidebarLeftCol buttonOn">Hide Subscribers</button
         ><button id = "hideFol" onclick = "changeHideFol(this)" class = "flatButton sidebarRightCol buttonOn">Hide Followers</button>
 
+		<!--
         <div class = 'sidebarLabel sidebarLeftCol'>Server Save</div
-          ><div class = 'sidebarRightCol'>
-            <div id = 'saveIntInp' class = 'numPickerInput'>5</div
-            ><div class = 'numPickerButtonsBox'>
-              <div onclick = 'incSaveInterval(1)' class = 'numPickerInc'>&#x25B2</div
-              ><div onclick = 'incSaveInterval(-1)' class = 'numPickerDec'>&#x25BC</div>
-            </div>
+        ><div class = 'sidebarRightCol'>
+          <div id = 'saveIntInp' class = 'numPickerInput'>5</div
+          ><div class = 'numPickerButtonsBox'>
+            <div onclick = 'incSaveInterval(1)' class = 'numPickerInc'>&#x25B2</div
+            ><div onclick = 'incSaveInterval(-1)' class = 'numPickerDec'>&#x25BC</div>
           </div>
+        </div>
+		-->
+		
+        <div class = 'sidebarLabel sidebarLeftCol'>Command</div
+        ><input id = 'commandInput' class = 'textInput sidebarRightCol' value = '%' onchange = 'setCommand(value)'></input>
+		
+		<div class = 'sidebarLabel sidebarLeftCol'>Tier 2 Coef</div
+        ><input id = 'tier2CoefInput' class = 'textInput sidebarRightCol' value = '2' onchange = 'setTier2Coef(value)'></input>
+		
+		<div class = 'sidebarLabel sidebarLeftCol'>Tier 3 Coef</div
+        ><input id = 'tier3CoefInput' class = 'textInput sidebarRightCol' value = '5' onchange = 'setTier3Coef(value)'></input>
 
       </div>
 
@@ -474,9 +500,12 @@
         <button id = "importData" oncontextmenu = "return false;" ondragover = "return false" ondrop = "event.preventDefault(); boolChoiceMenu(event, 'Which list to import?', 'Followers', 'Subscribers', dragAndDropFolFile, dragAndDropSubFile, event.dataTransfer.files)" onclick = "boolChoiceMenu(event, 'Which list to import?', 'Followers', 'Subscribers', processFolFileByClick, processSubFileByClick)" class = "flatButton sidebarFullRow importButton">Import As TXT</button>
         <button id = "exportCSV" onclick = "exportAsCSV()" class = "flatButton sidebarFullRow exportButton">Export As CSV</button>
         <button id = "exportTXT" onclick = "boolChoiceMenu(event, 'Which list to export?', 'Followers', 'Subscribers', exportFolAsTXT, exportSubAsTXT)" class = "flatButton sidebarFullRow exportButton">Export As TXT</button>
+		<button id = "exportMarblesOnStream" onclick = "exportMarbles()" class = "flatButton sidebarFullRow exportButton">Export For Marbles On Stream</button>
 
       </div>
 
+      </div>
+    
     </div>
 
     <div id = 'addRecord' class = 'addRecordBack'>
@@ -487,6 +516,16 @@
     </div>
 
     <script>
+	
+	  function setTier2Coef() {
+		const intVal = parseInt(value);
+		TIER_2_COEF = intVal >= 0 ? intVal : 0;
+	  }
+	  
+	  function setTier3Coef() {
+		const intVal = parseInt(value);
+		TIER_3_COEF = intVal >= 0 ? intVal : 0;
+	  }
 
       function incSaveInterval(val) {
 
@@ -561,11 +600,13 @@
       function addRecord() {
 
         takeCareAboutItem(
+		  selectedList,
           document.getElementById('addRecordName').value.toLowerCase(),
           document.getElementById('addRecordChoice').value, 
           sub.state, 
           document.getElementById('addRecordName').value,
-          (sub.state) ? 1 : 0
+          (sub.state) ? 1 : 0,
+		  1
         );
 
         document.getElementById('addRecord').style.display = 'none';
@@ -643,16 +684,15 @@
 
       }
 
-      // tmp solution
-      setCookie('channel', 'Krabick', 1);
-
     </script>
 
     <script> 
-      
+	  
       init();
-      loadStateLocalStorage(); // exchange later for loadState();
+	  loadState();
+      //loadStateLocalStorage(); // exchange later for loadState();
 
+	  /*
       window.addEventListener('beforeunload', function(event) {
         
         saveNewData(true);
@@ -661,6 +701,7 @@
         }
 
       }, false);
+	  */
 
     </script>
     

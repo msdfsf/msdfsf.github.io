@@ -26,33 +26,33 @@ function initTwitchBot(channel) {
 function processTwitchChatMessage(channel, user, message, self) {
 
   // message.startsWith('%');
-  if (collectRequests.state) {
+  for (var i = 0; i < activeListsCount; i++) {
 
-    var subMonth = 0;
-    if (!(user["badge-info"] === null)) {
-      subMonth = user["badge-info"]["subscriber"];
-      if (typeof subMonth === 'undefined') subMonth = user["badge-info"]["founder"];
-    } 
+    if (true || message.startsWith(lists[i].command)) {
+		
+	  console.log(user);
 
-    var sub = isSub(user);
-    if (subsOnly.state && !sub) return;
-    
-    takeCareAboutItem(
-      user.username, 
-      message.substr(1), 
-      sub, 
-      user["display-name"], 
-      Number(subMonth)
-    );
+      var subMonth = 0;
+      if (!(user["badge-info"] === null)) {
+        subMonth = user["badge-info"]["subscriber"];
+        if (typeof subMonth === 'undefined') subMonth = user["badge-info"]["founder"];
+      } 
 
-    // log
-    /*
-    var d = new Date();
-    console.log(
-      "[" + d.getHours() + ":" + d.getMinutes() + "] " + 
-      subMonth + " " + user["display-name"] + " " + message.substr(1)
-    );
-    */
+      var sub = isSub(user);
+      if (subsOnly.state && !sub) return;
+      
+	  var tier = (sub) ? getSubTier(user) : 0;
+      takeCareAboutItem(
+        lists[i],
+        user.username, 
+        message.substr(lists[i].command.length), 
+        sub,
+        user["display-name"], 
+        Number(subMonth),
+		tier		
+      );
+
+    }
 
   }
 
@@ -61,6 +61,13 @@ function processTwitchChatMessage(channel, user, message, self) {
 function isSub(user) {
   if (user["badges"] === null) return false;
   return user["subscriber"] || ((modAsSub.state && user["user-type"] === "mod") || (vipAsSub.state && user['badges']["vip"] === "1"));
+}
+
+function getSubTier(user) {
+	subStr = user['badges']['subscriber'];
+	if (subStr.length < 3) return 1;
+	if (subStr[0] === '2') return 2;
+	if (subStr[0] === '3') return 3;
 }
 
 function getTwitchUserID(username) {
