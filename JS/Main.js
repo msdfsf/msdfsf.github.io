@@ -37,6 +37,9 @@ const SUB_TIER_COLORS = [
 ];
 
 
+var twitchClient;
+
+
 var errorField;
 var popupMenu;
 var saveInterval;
@@ -46,6 +49,12 @@ var CHANNEL;
 var MAX_CHOICE_LENGTH;
 
 // local storage keys prefixes
+LS_CHANNEL = 'sapp_channel'
+
+LS_BACK_IMG = 'sapp_bimg';
+LS_BACK_BLUR = 'sapp_bblur';
+LS_BACK_OPACITY = 'sapp_bopac';
+
 LS_LISTS = 'sapp_lists';
 
 LS_SUB = 'saap_sub_';
@@ -91,9 +100,9 @@ function takeCareAboutItem(list, name, choice, sub, displayName, monthCount, tie
     entry.months = Number(monthCount);
     entry.displayName = displayName;
     entry.displayChoice = choice;
-	entry.tier = tier;
+	  entry.tier = tier;
 
-    if (list.isActive) {
+    if (list === selectedList) {
       if (updateEntry(entry, wasSub)) return;
     }
 
@@ -107,9 +116,9 @@ function takeCareAboutItem(list, name, choice, sub, displayName, monthCount, tie
     entry.months = Number(monthCount);
     entry.displayName = displayName;
     entry.displayChoice = choice;
-	entry.tier = tier;
+	  entry.tier = tier;
 
-    if (list.isActive) {
+    if (list === selectedList) {
       if (addEntry(entry)) return;
     }
   
@@ -423,10 +432,12 @@ function loadStateLocalStorage() {
 
   if (listsArr.length > 0) {
     viewList(createNewList(listsArr[0]));
+    lists[0].submitted = true;
   }
 
   for (var i = 1; i < listsArr.length; i++) {
     createNewList(listsArr[i]);
+    lists[i].submitted = true;
   }
 
   loadListLocalStorage(listsArr[0]);
@@ -531,9 +542,13 @@ function loadSubIcons() {
 
 function init() {
 
-  // init consts
+  // init 'consts'
   LIST_NAME = 'default';
-  CHANNEL = 'yugybunyg';// readCookie('channel');
+
+  savedChannel = localStorage.getItem(LS_CHANNEL);
+  CHANNEL = savedChannel ? savedChannel : 'Krabick';// readCookie('channel');
+  document.getElementById('channelInput').value = CHANNEL;
+  
   MAX_CHOICE_LENGTH = 60;
   
   // load sub icons to memory
@@ -570,6 +585,7 @@ function init() {
 
   function search(event) {
 
+    // TODO
     var entry = event.target.parentNode.parentNode.entry;
     var url = 'https://www.youtube.com/results?search_query=' + entry.choice;
     window.open(url, '_blank').focus();
@@ -600,31 +616,10 @@ function init() {
   }
 
   // init error handler
-  errorField = document.createElement('div');
-
-  errorField.style.position       = 'absolute';
-  errorField.style.bottom         = 0;
-  errorField.style.right          = 0;
-  errorField.style.width          = '200px';
-  errorField.style.height         = 'auto';
-  errorField.style.display        = 'flex';
-  errorField.style.flexDirection  = 'column';
-  errorField.style.justifyContent = 'flex-end';
-  errorField.style.boxSizing      = 'border-box';
-  errorField.style.overflow       = 'hidden';
-
-  errorField.MAX_ERRORS = 4;
-  errorField.ERROR_HEIGHT = 600 / errorField.MAX_ERRORS;
-  errorField.TTL = 4; // in s
-  errorField.errorsCount = 0;
-
-  document.body.appendChild(errorField);
+  // RIP
 
   // init twitch bot
-  initTwitchBot(CHANNEL);
-
-  // start server save timer //
-  // serverSaveTimer(); // depends on saveInterval
+  twitchClient = initTwitchBot(CHANNEL);
 
   // defaulty hidding list view
   document.getElementById('listsContainer').style.display = 'none';
@@ -651,79 +646,6 @@ function logLocalStorageSpace() {
   console.log(ans);
 
 };
-
-function serverSaveTimer() {
-
-  // delete later
-  displayError('Could not save data! Alert!');
-
-  if (saveInterval < 1) return;
-  window.setTimeout(serverSaveTimer, saveInterval * 1000);
-
-  saveNewData();
-
-}
-
-function saveNewData(sync = false) {
-
-  if (isHashEmpty(newFolEntries) && isHashEmpty(newSubEntries)) return;
-  
-  // send new data to server and empty buffers
-  
-  jsonBody = '{ user: "' + CHANNEL + '", listName: "' + LIST_NAME + '", requestData: "';
-  
-  // ? functions ?
-  for (fol in newFolEntries) {
-    jsonBody += '(\"' + newFolEntries[fol].name + '\", ' + 0 + ', ' + newFolEntries[fol].months + ', \"' + addSlashes(newFolEntries[fol].choice) + '\"), ';
-  }
-
-  for (sub in newFolEntries) {
-    jsonBody += '(\"' + newFolEntries[sub].name + '\", ' + 1 + ', ' + newFolEntries[sub].months + ', \"' + addSlashes(newFolEntries[sub].choice) + '\"), ';
-  }
-
-  jsonBody = jsonBody.substring(0, jsonBody.length - 2); // meh
-
-  jsonBody += '"}';
-
-  header = {};
-  header.key = 'token';
-  header.value = localStorage.getItem('token');
-  
-  console.log(jsonBody);
-
-  return; // remove later
-
-  httpPost('api/subapp/save', callback, body, header, sync);
-  
-  function callback(response) {
-
-    console.log(response);
-    if (error) {
-      displayError(error.toString());
-      
-      appendHash(newFolEntries, tmpFol);
-      appendHash(newSubEntries, tmpSub);
-
-      localStorage.setItem('last_list_name', LIST_NAME);
-
-    } else {
-
-      localStorage.removeItem('last_list_name');
-    
-    }
-
-    tmpFol = null;
-    tmpSub = null;
-
-  }
-
-  tmpFol = copyHash(newFolEntries);
-  tmpSub = copyHash(newSubEntries);
-
-  newFolEntries = {};
-  newSubEntries = {};
-
-}
 
 function isHashEmpty(hash) {
 
@@ -755,85 +677,15 @@ function appendHash(target, source) {
 
 }
 
- function addSlashes(str) {
+function addSlashes(str) {
   return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
-}
-
-var errorID = 0;
-function displayError(errorMessage) {
-
-  console.log('[ERROR] ' + errorMessage);
-
-  var container = document.createElement('div');
-
-  container.style.color           = 'white';
-  container.style.backgroundColor = '#FF3333';
-  container.style.width           = '100%';
-  container.style.height          = '80px';
-  container.style.marginTop       = '2px';
-  container.style.boxSizing       = 'border-box';
-  container.style.padding         = '4%';
-  container.style.borderRadius    = '5px';
-  container.style.borderWidth     = '2px';
-  container.style.borderStyle     = 'solid';
-  container.style.borderColor     = 'white';
-  container.style.display         = 'flex';
-  container.style.flexDirection   = 'row';
-  container.style.alignItems      = 'center';
-  container.style.justifyContent  = 'start';
-  container.style.transition      = 'transform 1s, opacity 0.5s';
-  container.style.transform       = 'translateX(200px)';
-
-  var symbol = document.createElement('img');
-
-  symbol.src                = 'Icons/error.svg';
-  symbol.style.height       = '50%';
-  symbol.style.aspectRatio  = '1 / 1';
-  symbol.style.paddingRight = '6%';
-  symbol.style.filter       = 'invert(1)';
-
-  var message = document.createElement('div');
-
-  message.style.height = 'auto';
-  message.innerHTML = errorMessage + '[' + errorID + ']';
-  errorID++;
-
-  if (errorField.errorsCount >= errorField.MAX_ERRORS) {
-    
-    clearTimeout(errorField.firstChild.ttlTmr);
-    errorField.removeChild(errorField.firstChild);
-  
-  }
-
-  container.appendChild(symbol);
-  container.appendChild(message);
-  errorField.appendChild(container);
-
-  setTimeout(function() {
-
-    container.style.transform = 'translateX(0px)';
-
-  }, 1);
-
-  errorField.errorsCount++;
-
-  container.ttlTmr = setTimeout(function() {
-
-    container.style.opacity = 0;
-
-    container.ttlTmr = setTimeout(function() {
-      errorField.removeChild(container);
-      errorField.errorsCount--;
-    }, 500);
-
-  }, errorField.TTL * 1000);
-
 }
 
 function addNewList() {
 
   var newList = createNewList('enter name');
 
+  newList.submitted = false;
   newList.contentEditable = true;
   newList.focus();
 
@@ -847,6 +699,7 @@ function createNewList(name) {
   newList.className = 'listsTabsItem';
 
   newList.name = name;
+  newList.isActive = false;
 
   newList.command = (lists.length === 0) ? '%' : '%' + lists.length;
   document.getElementById('commandInput').value = newList.command;
@@ -874,8 +727,26 @@ function createNewList(name) {
     if (newName == '') {
       
       if (confirm('Wanna delete list?')) {
-        removeList(this);
+        
+        if (this.submitted) {
+
+          removeList(this);
+        
+        } else {
+
+          if (this.isActive) activeListsCount--;
+          lists.splice(lists.indexOf(this), 1);
+
+          this.remove();
+          if (lists.length === 0) {
+            document.getElementById('listsContainer').style.display = 'none';
+            disableSidebar();
+          }
+
+        }
+        
         return;
+      
       }
 
       this.innerHTML = oldName;
@@ -885,13 +756,14 @@ function createNewList(name) {
     if (!setListName(this, newName)) {
       
       this.wasAnAlert = true;
-      alert('Name have to be unique and not contain \'' + PARAM_DELIMITER + '\'!');
+      alert('Name has to be unique and not contain \'' + PARAM_DELIMITER + '\'!');
       this.focus();
 
       return;
     
     }
-
+    
+    this.submitted = true;
     this.contentEditable = false;
   
   });
@@ -922,8 +794,8 @@ function createNewList(name) {
 
 function removeList(list) {
 
-  listsStr = localStorage.getItem(LS_LISTS);
-  listsArr = (listsStr == null || listsStr === '') ? [] : listsStr.split(PARAM_DELIMITER);
+  var listsStr = localStorage.getItem(LS_LISTS);
+  var listsArr = (listsStr == null || listsStr === '') ? [] : listsStr.split(PARAM_DELIMITER);
 
   var i;
   for (i = 0; i < listsArr.length; i++) {
@@ -935,10 +807,23 @@ function removeList(list) {
 
   }
 
+  if (list.isActive) activeListsCount--;
   lists.splice(lists.indexOf(list), 1);
 
   localStorage.setItem(LS_LISTS, listsArr.join(PARAM_DELIMITER));
   
+  var folCount = localStorage.getItem(LS_FOL_COUNT + list.name);
+  for (var i = 1; i <= folCount; i++) {
+    localStorage.removeItem(LS_FOL + list.name + '_' + i);
+  }
+  localStorage.removeItem(LS_FOL_COUNT + list.name);
+
+  var subCount = localStorage.getItem(LS_SUB_COUNT + list.name);
+  for (var i = 1; i <= subCount; i++) {
+    localStorage.removeItem(LS_SUB + list.name + '_' + i);
+  }
+  localStorage.removeItem(LS_SUB_COUNT + list.name);
+
   list.remove();
   if (lists.length === 0) {
     document.getElementById('listsContainer').style.display = 'none';
@@ -955,6 +840,9 @@ function disableSidebar() {
 
 function enableSidebar() {
 
+  if (document.getElementById('sidebarWrapperGlobal').style.display === '') {
+    return;
+  }
   document.getElementById('sidebarWrapper').style.display = '';
 
 }
@@ -965,7 +853,7 @@ function setListName(list, name) {
     if (lists[i] != list && lists[i].name === name) return false;
   }
 
-  var oldName = list.name;
+  var oldName = (list.submitted) ? list.name : '';
   list.name = name;
   saveListName(list, oldName);
 
@@ -1006,6 +894,10 @@ function viewList(list) {
   if (selectedList != null) selectedList.className = 'listsTabsItem';
   list.className = 'listsTabsItemActive';
 
+  if (list.isActive != collectRequests.state) {
+    changeButtonStateAndName(collectRequests, 'Collect Requests', 'Stop Request Collecting');
+  }
+
   selectedList = list;
   loadListData(list);
 
@@ -1017,6 +909,21 @@ function viewList(list) {
 }
 
 function loadListData(list) {
+
+}
+
+function setChannel(name) {
+
+  stopTwitchBot(twitchClient);
+
+  CHANNEL = name;
+  localStorage.setItem(LS_CHANNEL, name);
+
+  var tmp = loadSubIcons();
+  subIcons = tmp.subIcons;
+  subIconsMonths = tmp.months;
+
+  twitchClient = initTwitchBot(CHANNEL);
 
 }
 

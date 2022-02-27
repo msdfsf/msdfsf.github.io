@@ -21,6 +21,14 @@ function initTwitchBot(channel) {
 
   client.on('chat', processTwitchChatMessage);
 
+  return client;
+
+}
+
+function stopTwitchBot(client) {
+
+  client.disconnect();
+
 }
 
 function processTwitchChatMessage(channel, user, message, self) {
@@ -28,18 +36,18 @@ function processTwitchChatMessage(channel, user, message, self) {
   // message.startsWith('%');
   for (var i = 0; i < activeListsCount; i++) {
 
-    if (true || message.startsWith(lists[i].command)) {
+    if (message.startsWith(lists[i].command)) {
 		
-	  console.log(user);
+	  // console.log(user);
 
-      var subMonth = 0;
-      if (!(user["badge-info"] === null)) {
-        subMonth = user["badge-info"]["subscriber"];
-        if (typeof subMonth === 'undefined') subMonth = user["badge-info"]["founder"];
-      } 
+    var subMonth = 0;
+    if (!(user["badge-info"] === null)) {
+      subMonth = user["badge-info"]["subscriber"];
+      if (typeof subMonth === 'undefined') subMonth = user["badge-info"]["founder"];
+    } 
 
-      var sub = isSub(user);
-      if (subsOnly.state && !sub) return;
+    var sub = isSub(user);
+    if (subsOnly.state && !sub) return;
       
 	  var tier = (sub) ? getSubTier(user) : 0;
       takeCareAboutItem(
@@ -49,9 +57,8 @@ function processTwitchChatMessage(channel, user, message, self) {
         sub,
         user["display-name"], 
         Number(subMonth),
-		tier		
+		    tier		
       );
-
     }
 
   }

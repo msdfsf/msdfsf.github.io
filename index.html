@@ -112,10 +112,12 @@
         cursor: pointer;
         font-size: 30px;
         width: 30px;
-        height: 30px;
+        height: 40px;
         margin: 0px 0px;
         left: 250px;
         top: -2.5px;
+        border-radius: 0 10px 10px 0;
+        box-shadow: 0px 0px 14px 0px rgb(44 44 44 / 75%);
         user-select: none;
       }
 
@@ -179,6 +181,7 @@
         margin-left: 5%;
         margin-right: 1%;
         margin-bottom: 5%;
+        box-sizing: border-box;
       }
 
       .sidebarRightCol {
@@ -190,6 +193,13 @@
         margin-left: 1%;
         margin-right: 5%;
         margin-bottom: 5%;
+        box-sizing: border-box;
+      }
+
+      .sidebarGlobalOption {
+        font-size: 30px;
+        margin-top: 10px;
+        cursor: pointer;
       }
 
       .sidebarLabel, .textInput {
@@ -374,6 +384,18 @@
       .numPickerDec:active {
         font-size: 10px;
       }
+	  
+	  .optionSelectButton {
+		
+		padding: 5px;
+		text-align: center;
+		margin-bottom: 5px;
+		display: inline-block;
+		font-weight: bold;
+		font-size: 10px;
+    user-select: none;
+	  
+	  }
 
     </style>
 
@@ -397,7 +419,7 @@
 
     <div id = "notSideBar" class = 'notSideBar'>
 
-      <div class = 'listsTabs'>
+      <div class = 'listsTabs' id = 'listsTabs'>
         <div class = 'liststTabOverflowHelper' id = 'listsAdder'>
           <div class = 'listsTabsItem' onclick = 'addNewList()'>+</div>
         </div>
@@ -425,86 +447,106 @@
 	
     <div id = "sidebar" class = "sidebar">
 
-      <div class = "toggleButton" onclick = "toggleSidebar()">
+      <div id = 'toggleButton' class = "toggleButton" onclick = "toggleSidebar()">
         &#9776
       </div>
 	  
-	  <div class = 'sidebarWrapper'>
-		  <div class = "sidebarControls">
-			  <button id = "globalMenu" onclick = "" class = "flatButton addButton sidebarRightCol">Global Options</button
-			  ><button id = "localMenu" onclick = "" class = "flatButton addButton sidebarLeftCol">Local Options</button>
-		  </div>
-	  <div id = 'sidebarWrapperGlobal' class = 'sidebarWrapper'>
+		<div class = 'sidebarWrapper'>
+		
+			<div class = "sidebarControls" style = "border-bottom: white solid 1px; padding-bottom: 5px;">
+				<div id = "globalMenu" onclick = "openGlobalOptions()" class = "optionSelectButton sidebarLeftCol sidebarGlobalOption" style = 'font-size: 15px;'>Global Options</div
+				><div id = "localMenu" onclick = "openLocalOptions()" class = "optionSelectButton sidebarRightCol sidebarGlobalOption" style = 'font-size: 15px;'>Local Options</div>
+			</div>
 	  
-	  <div id = 'sidebarWrapperGlobal' class = 'sidebarWrapper'>
+			<div id = 'sidebarWrapperGlobal' class = 'sidebarWrapper'>
 
-      <p class = "sidebarTitle"> Set Background </p>
-      <div class = "sidebarControls">
-    
-        <button id = "collectRequests" onclick = "changeCollectRequests()" class = "flatButton sidebarFullRow">Collect Requests</button>
-        <button id = "addRecordTrigger" onclick = "displayAddRecord()" class = "flatButton addButton sidebarFullRow">Add Record</button>
-        <button id = "resetButton" onclick = "clearList();" class = "flatButton resetButton sidebarFullRow">Reset</button>
+				<p class = "sidebarTitle"> Channel </p>
+				<div class = "sidebarControls">
+		
+					<input id = 'channelInput' class = 'textInput sidebarFullRow' value = 'Krabick' onchange = 'setChannel(value)'></input>
 
-      </div>
+				</div>
 
-      </div>
+        <p class = "sidebarTitle"> Background Image </p>
+				<div class = "sidebarControls">
+		
+					<input id = 'backimgInput' class = 'textInput sidebarFullRow' value = 'background.png' onchange = 'setBackgroundImage(value)'></input>
+
+				</div>
+
+        <p class = "sidebarTitle"> Opacity </p>
+				<div class = "sidebarControls">
+		
+					<input id = 'opacityInput' type = 'range' min = '0' max = '100' class = 'textInput sidebarFullRow' value = '90' onchange = 'setBackgroundOpacity(value)'></input>
+
+				</div>
+
+        <p class = "sidebarTitle"> Blur </p>
+				<div class = "sidebarControls">
+		
+					<input id = 'blurInput' type = 'range' min = '0' max = '100' class = 'textInput sidebarFullRow' value = '4' onchange = 'setBackgroundBlur(value)'></input>
+
+				</div>
+
+			</div>
+		</div>
 	  
-      <div id = 'sidebarWrapper' class = 'sidebarWrapper'>
+		<div id = 'sidebarWrapper' class = 'sidebarWrapper'>
 
-      <p class = "sidebarTitle"> Controls </p>
-      <div class = "sidebarControls">
+			<p class = "sidebarTitle"> Controls </p>
+			<div class = "sidebarControls">
     
-        <button id = "collectRequests" onclick = "changeCollectRequests()" class = "flatButton sidebarFullRow">Collect Requests</button>
-        <button id = "addRecordTrigger" onclick = "displayAddRecord()" class = "flatButton addButton sidebarFullRow">Add Record</button>
-        <button id = "resetButton" onclick = "clearList();" class = "flatButton resetButton sidebarFullRow">Reset</button>
+				<button id = "collectRequests" onclick = "changeCollectRequests()" class = "flatButton sidebarFullRow">Collect Requests</button>
+				<button id = "addRecordTrigger" onclick = "displayAddRecord()" class = "flatButton addButton sidebarFullRow">Add Record</button>
+				<button id = "resetButton" onclick = "clearList();" class = "flatButton resetButton sidebarFullRow">Reset</button>
 
-      </div>
+			</div>
 
-      <p class = "sidebarTitle"> Settings </p>
-      <div class = "sidebarControls">
+			<p class = "sidebarTitle"> Settings </p>
+			<div class = "sidebarControls">
 
-        <button id = "duplicatesCheck" onclick = "changeDuplicateCheck()" class = "flatButton sidebarLeftCol buttonOn">Duplicates Check</button
-        ><button id = "subsOnly" onclick = "changeSubsOnly()" class = "flatButton sidebarRightCol buttonOn">Subs Only</button>
+				<button id = "duplicatesCheck" onclick = "changeDuplicateCheck()" class = "flatButton sidebarLeftCol buttonOn">Duplicates Check</button
+				><button id = "subsOnly" onclick = "changeSubsOnly()" class = "flatButton sidebarRightCol buttonOn">Subs Only</button>
         
-        <button id = "modAsSub" onclick = "changeModAsSub()" class = "flatButton sidebarLeftCol buttonOn">Mods ASS Subs</button
-        ><button id = "vipAsSub" onclick = "changeVipAsSub()" class = "flatButton sidebarRightCol buttonOn">Vips ASS Subs</button>
+				<button id = "modAsSub" onclick = "changeModAsSub()" class = "flatButton sidebarLeftCol buttonOn">Mods ASS Subs</button
+				><button id = "vipAsSub" onclick = "changeVipAsSub()" class = "flatButton sidebarRightCol buttonOn">Vips ASS Subs</button>
     
-        <button id = "hideSub" onclick = "changeHideSub(this)" class = "flatButton sidebarLeftCol buttonOn">Hide Subscribers</button
-        ><button id = "hideFol" onclick = "changeHideFol(this)" class = "flatButton sidebarRightCol buttonOn">Hide Followers</button>
+				<button id = "hideSub" onclick = "changeHideSub(this)" class = "flatButton sidebarLeftCol buttonOn">Hide Subscribers</button
+				><button id = "hideFol" onclick = "changeHideFol(this)" class = "flatButton sidebarRightCol buttonOn">Hide Followers</button>
 
-		<!--
-        <div class = 'sidebarLabel sidebarLeftCol'>Server Save</div
-        ><div class = 'sidebarRightCol'>
-          <div id = 'saveIntInp' class = 'numPickerInput'>5</div
-          ><div class = 'numPickerButtonsBox'>
-            <div onclick = 'incSaveInterval(1)' class = 'numPickerInc'>&#x25B2</div
-            ><div onclick = 'incSaveInterval(-1)' class = 'numPickerDec'>&#x25BC</div>
-          </div>
-        </div>
-		-->
+				<!--
+				<div class = 'sidebarLabel sidebarLeftCol'>Server Save</div
+				><div class = 'sidebarRightCol'>
+				  <div id = 'saveIntInp' class = 'numPickerInput'>5</div
+				  ><div class = 'numPickerButtonsBox'>
+					<div onclick = 'incSaveInterval(1)' class = 'numPickerInc'>&#x25B2</div
+					><div onclick = 'incSaveInterval(-1)' class = 'numPickerDec'>&#x25BC</div>
+				  </div>
+				</div>
+				-->
 		
-        <div class = 'sidebarLabel sidebarLeftCol'>Command</div
-        ><input id = 'commandInput' class = 'textInput sidebarRightCol' value = '%' onchange = 'setCommand(value)'></input>
+				<div class = 'sidebarLabel sidebarLeftCol'>Command</div
+				><input id = 'commandInput' class = 'textInput sidebarRightCol' value = '%' onchange = 'setCommand(value)'></input>
 		
-		<div class = 'sidebarLabel sidebarLeftCol'>Tier 2 Coef</div
-        ><input id = 'tier2CoefInput' class = 'textInput sidebarRightCol' value = '2' onchange = 'setTier2Coef(value)'></input>
+				<div class = 'sidebarLabel sidebarLeftCol'>Tier 2 Coef</div
+				><input id = 'tier2CoefInput' class = 'textInput sidebarRightCol' value = '2' onchange = 'setTier2Coef(value)'></input>
 		
-		<div class = 'sidebarLabel sidebarLeftCol'>Tier 3 Coef</div
-        ><input id = 'tier3CoefInput' class = 'textInput sidebarRightCol' value = '5' onchange = 'setTier3Coef(value)'></input>
+				<div class = 'sidebarLabel sidebarLeftCol'>Tier 3 Coef</div
+				><input id = 'tier3CoefInput' class = 'textInput sidebarRightCol' value = '5' onchange = 'setTier3Coef(value)'></input>
 
-      </div>
+			</div>
 
-      <p class = "sidebarTitle"> Export / Import </p>
-      <div class = "sidebarControls">
+			<p class = "sidebarTitle"> Export / Import </p>
+			<div class = "sidebarControls">
 
-        <button id = "importData" oncontextmenu = "return false;" ondragover = "return false" ondrop = "event.preventDefault(); boolChoiceMenu(event, 'Which list to import?', 'Followers', 'Subscribers', dragAndDropFolFile, dragAndDropSubFile, event.dataTransfer.files)" onclick = "boolChoiceMenu(event, 'Which list to import?', 'Followers', 'Subscribers', processFolFileByClick, processSubFileByClick)" class = "flatButton sidebarFullRow importButton">Import As TXT</button>
-        <button id = "exportCSV" onclick = "exportAsCSV()" class = "flatButton sidebarFullRow exportButton">Export As CSV</button>
-        <button id = "exportTXT" onclick = "boolChoiceMenu(event, 'Which list to export?', 'Followers', 'Subscribers', exportFolAsTXT, exportSubAsTXT)" class = "flatButton sidebarFullRow exportButton">Export As TXT</button>
-		<button id = "exportMarblesOnStream" onclick = "exportMarbles()" class = "flatButton sidebarFullRow exportButton">Export For Marbles On Stream</button>
+				<button id = "importData" oncontextmenu = "return false;" ondragover = "return false" ondrop = "event.preventDefault(); boolChoiceMenu(event, 'Which list to import?', 'Followers', 'Subscribers', dragAndDropFolFile, dragAndDropSubFile, event.dataTransfer.files)" onclick = "boolChoiceMenu(event, 'Which list to import?', 'Followers', 'Subscribers', processFolFileByClick, processSubFileByClick)" class = "flatButton sidebarFullRow importButton">Import As TXT</button>
+				<button id = "exportCSV" onclick = "exportAsCSV()" class = "flatButton sidebarFullRow exportButton">Export As CSV</button>
+				<button id = "exportTXT" onclick = "boolChoiceMenu(event, 'Which list to export?', 'Followers', 'Subscribers', exportFolAsTXT, exportSubAsTXT)" class = "flatButton sidebarFullRow exportButton">Export As TXT</button>
+				<button id = "exportMarblesOnStream" onclick = "boolChoiceMenu(event, 'Which list to export?', 'Followers', 'Subscribers', exportFolMarbles, exportSubMarbles)" class = "flatButton sidebarFullRow exportButton">Export For Marbles On Stream</button>
 
-      </div>
+			</div>
 
-      </div>
+		</div>
     
     </div>
 
@@ -516,6 +558,103 @@
     </div>
 
     <script>
+	
+		window.onload = function () {
+      
+      const bimg = localStorage.getItem(LS_BACK_IMG);
+      if (!!bimg) {
+        setBackgroundImage(bimg); 
+        document.getElementById('backimgInput').value = bimg;
+      } else {
+        setBackgroundImage('background.png');
+      }
+
+      const bblur = localStorage.getItem(LS_BACK_BLUR);
+      if (!!bblur) {
+        setBackgroundBlur(bblur); 
+        document.getElementById('blurInput').value = bblur;
+      } else {
+        setBackgroundBlur(4);
+      }
+
+      const bopac = localStorage.getItem(LS_BACK_OPACITY);
+      if (!!bopac) {
+        setBackgroundOpacity(bopac); 
+        document.getElementById('opacityInput').value = bopac;
+      } else {
+        setBackgroundOpacity(90);
+      }
+
+      openGlobalOptions();
+
+    }
+	
+		function openGlobalOptions() {
+		
+			document.getElementById('sidebarWrapperGlobal').style.display = '';
+			document.getElementById('sidebarWrapper').style.display = 'none';
+
+      var globalMenu = document.getElementById('globalMenu');
+      globalMenu.style.color = 'black';
+      globalMenu.style.backgroundColor = 'white';
+
+      var localMenu = document.getElementById('localMenu');
+      localMenu.style.color = 'white';
+      localMenu.style.backgroundColor = '';
+			
+		}
+		
+		function openLocalOptions() {
+			
+			document.getElementById('sidebarWrapperGlobal').style.display = 'none';
+
+      var globalMenu = document.getElementById('globalMenu');
+      globalMenu.style.color = 'white';
+      globalMenu.style.backgroundColor = '';
+
+      var localMenu = document.getElementById('localMenu');
+      localMenu.style.color = 'black';
+      localMenu.style.backgroundColor = 'white';
+
+      if (lists.length < 1) return;
+      document.getElementById('sidebarWrapper').style.display = '';
+			
+		}
+
+    function setBackgroundImage(value) {
+
+      document.body.style.backgroundImage = 'url(' + value + ')';
+      localStorage.setItem(LS_BACK_IMG, value);
+
+    }
+
+    function setBackgroundOpacity(value) {
+
+      const cnt = document.getElementById('listsContainer');
+      const hdr = document.getElementById('listsTabs');
+      const btn = document.getElementById('toggleButton');
+
+      cnt.style.backgroundColor = 'rgba(19, 19, 19, ' + (value / 100);
+      hdr.style.backgroundColor = 'rgba(19, 19, 19, ' + (value / 100);
+      btn.style.backgroundColor = 'rgba(19, 19, 19, ' + (value / 100);
+
+      localStorage.setItem(LS_BACK_OPACITY, value);
+
+    }
+
+    function setBackgroundBlur(value) {
+
+      const cnt = document.getElementById('listsContainer');
+      const hdr = document.getElementById('listsTabs');
+      const btn = document.getElementById('toggleButton');
+
+      cnt.style.backdropFilter = 'blur(' + value + 'px)';
+      hdr.style.backdropFilter = 'blur(' + value + 'px)';
+      btn.style.backdropFilter = 'blur(' + value + 'px)';
+
+      localStorage.setItem(LS_BACK_BLUR, value);
+      
+    }
 	
 	  function setTier2Coef() {
 		const intVal = parseInt(value);
@@ -689,7 +828,7 @@
     <script> 
 	  
       init();
-	  loadState();
+	    loadState();
       //loadStateLocalStorage(); // exchange later for loadState();
 
 	  /*

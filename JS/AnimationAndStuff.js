@@ -44,8 +44,6 @@ function changeCollectRequests() {
     
     if (collectRequests.state) {
         
-        activeListsCount++;
-        
         if (lists.length > activeListsCount) {
 
             firstInactive = lists[activeListsCount];
@@ -53,6 +51,8 @@ function changeCollectRequests() {
             lists[activeListsCount] = selectedList;
         
         }
+
+        activeListsCount++;
     
     } else {
 

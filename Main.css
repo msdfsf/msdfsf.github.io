@@ -10,7 +10,7 @@ font-family: 'Roboto', sans-serif;
 }
 
 *::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px #131313;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0);/*#131313;*/
     border-radius: 10px;
 }
 
@@ -101,7 +101,7 @@ body {
     width: 50%;
     height: 100%;
     color: white;
-    background-color: #131313;
+    /*background-color: #131313;*/
     display: inline-block;
     transition: 0.5s;
     opacity: 1;
@@ -140,7 +140,7 @@ body {
     width: 100%;
     height: calc(100% - 88px);
     color: white;
-    background-color: #131313;
+    /*background-color: #131313;*/
     position: relative;
     box-sizing: border-box;
     overflow-y: scroll;
