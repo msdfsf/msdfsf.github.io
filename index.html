@@ -411,6 +411,31 @@
   <body>
   
 	<script>
+		AUTH_TOKEN = null;
+		
+		if (!localStorage.getItem('auth')) {
+			
+			localStorage.setItem('auth', 1);
+			const bgResponseUrl = 'http://localhost:8000/';//window.location.origin;
+			const url = 'https://id.twitch.tv/oauth2/authorize?client_id=' + cfg.CLIENT_ID + '&redirect_uri=' + bgResponseUrl + '&response_type=token';
+			window.location.replace(url);
+			
+		} else {
+			
+			localStorage.removeItem('auth');
+			hashParams = window.location.hash.substr(1);
+			history.pushState("", document.title, window.location.pathname + window.location.search);
+			if (hashParams) {
+				tmp = hashParams.split('&')[0].split('=');
+				if (tmp.length > 1) {
+					AUTH_TOKEN = tmp[1];
+				}
+			}
+			
+		}
+	</script>
+  
+	<script>
 		// global vars
 		
 		var TIER_2_COEF = 2;

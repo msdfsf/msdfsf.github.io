@@ -84,21 +84,21 @@ function getTwitchUserID(username) {
   H1.value = cfg.CLIENT_ID;
 
   H2 = {};
-  H2.key = 'Accept';
-  H2.value = 'application/vnd.twitchtv.v5+json';
+  H2.key = 'Authorization';
+  H2.value = 'Bearer ' + AUTH_TOKEN;
 
   headers = [H1, H2];
 
   var userID = null;
-  httpGet('https://api.twitch.tv/kraken/users?login=' + username, callback, headers, true);
+  httpGet('https://api.twitch.tv/helix/users?login=' + username, callback, headers, true);
 
   function callback(response) {
 
     const json = JSON.parse(response);
-    const user = json.users[0];
+    const user = json.data[0];
 
     if (user != null) {
-      userID = user._id;
+      userID = user.id;
       return;
     }
 
@@ -110,6 +110,8 @@ function getTwitchUserID(username) {
 
 // test later for user without subscribers
 function getTwitchSubBadgesByID(userID) {
+	
+	if (!AUTH_TOKEN) return;
 
   H1 = {};
   H1.key = 'Client-ID';
