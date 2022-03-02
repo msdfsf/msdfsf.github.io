@@ -416,7 +416,7 @@
 		if (!localStorage.getItem('auth')) {
 			
 			localStorage.setItem('auth', 1);
-			const bgResponseUrl = 'http://localhost:8000/';//window.location.origin;
+			const bgResponseUrl = window.location.origin;
 			const url = 'https://id.twitch.tv/oauth2/authorize?client_id=' + cfg.CLIENT_ID + '&redirect_uri=' + bgResponseUrl + '&response_type=token';
 			window.location.replace(url);
 			
